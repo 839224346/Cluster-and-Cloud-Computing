@@ -3,11 +3,12 @@ import './App.css';
 import React, { Component } from 'react';
 import { mapStyle } from './resource/map-style'
 import { Con } from './resource/const'
-import { Select } from 'antd'
+import { Select, DatePicker, Button } from 'antd'
+import { SearchOutlined } from '@ant-design/icons'
 import InfoWindow from './InfoWindow'
 import axios from 'react-axios'
-
 import * as echarts from 'echarts'
+import 'antd/dist/antd.css'
 
 
 export default class Map extends Component{
@@ -16,15 +17,21 @@ export default class Map extends Component{
     super(props)
     this.state = {
       searchContent: "",
+      searchFactor:'',
+      startTime:0,
+      endTime:0
     }
   }
 
   componentDidMount(){
     this.initMap();
+    // this.getRelationData();
     this.initEchats();
   }
 
-  initEchats = () =>{
+  initEchats = (relationData) =>{
+    // const lga_name = relationData.lga_name;
+    // const {score, GP_num, education_rank, population_num,averg_income, averg_age, homeless_rate} = relationData.factor;
     var myChart = echarts.init(document.getElementById('forms'));
     let option;
     option = {
@@ -35,7 +42,7 @@ export default class Map extends Component{
             }
         },
         legend: {
-            data: ['直接访问', '邮件营销', '联盟广告', '视频广告', '搜索引擎', '百度', '谷歌', '必应', '其他']
+            data: ['Emotion', 'GP', 'Education', 'Population', 'Income', 'Age', "Homeless"]
         },
         grid: {
             left: '3%',
@@ -56,7 +63,7 @@ export default class Map extends Component{
         ],
         series: [
             {
-                name: '直接访问',
+                name: 'Emotion',
                 type: 'bar',
                 emphasis: {
                     focus: 'series'
@@ -64,84 +71,66 @@ export default class Map extends Component{
                 data: [320, 332, 301, 334, 390, 330, 320]
             },
             {
-                name: '邮件营销',
+                name: 'GP',
                 type: 'bar',
-                stack: '广告',
+                // stack: '广告',
                 emphasis: {
                     focus: 'series'
                 },
                 data: [120, 132, 101, 134, 90, 230, 210]
             },
             {
-                name: '联盟广告',
+                name: 'Education',
                 type: 'bar',
-                stack: '广告',
+                // stack: '广告',
                 emphasis: {
                     focus: 'series'
                 },
                 data: [220, 182, 191, 234, 290, 330, 310]
             },
             {
-                name: '视频广告',
+                name: 'Population',
                 type: 'bar',
-                stack: '广告',
+                // stack: '广告',
                 emphasis: {
                     focus: 'series'
                 },
                 data: [150, 232, 201, 154, 190, 330, 410]
             },
             {
-                name: '搜索引擎',
+                name: 'Income',
                 type: 'bar',
                 data: [862, 1018, 964, 1026, 1679, 1600, 1570],
                 emphasis: {
                     focus: 'series'
                 },
-                markLine: {
-                    lineStyle: {
-                        type: 'dashed'
-                    },
-                    data: [
-                        [{type: 'min'}, {type: 'max'}]
-                    ]
-                }
+                // markLine: {
+                //     lineStyle: {
+                //         type: 'dashed'
+                //     },
+                //     data: [
+                //         [{type: 'min'}, {type: 'max'}]
+                //     ]
+                // }
             },
             {
-                name: '百度',
+                name: 'Age',
                 type: 'bar',
                 barWidth: 5,
-                stack: '搜索引擎',
+                // stack: '搜索引擎',
                 emphasis: {
                     focus: 'series'
                 },
                 data: [620, 732, 701, 734, 1090, 1130, 1120]
             },
             {
-                name: '谷歌',
+                name: 'Homeless',
                 type: 'bar',
-                stack: '搜索引擎',
+                // stack: '搜索引擎',
                 emphasis: {
                     focus: 'series'
                 },
                 data: [120, 132, 101, 134, 290, 230, 220]
-            },
-            {
-                name: '必应',
-                type: 'bar',
-                stack: '搜索引擎',
-                emphasis: {
-                    focus: 'series'
-                },
-                data: [60, 72, 71, 74, 190, 130, 110]
-            },
-            {
-                name: '其他',
-                type: 'bar',
-                stack: '搜索引擎',
-                emphasis: {
-                    focus: 'series'
-                },
-                data: [62, 82, 91, 84, 109, 110, 120]
             }
         ]
     };
@@ -156,115 +145,9 @@ export default class Map extends Component{
       disableDefaultUI: true,
       styles: mapStyle
     })
-    
-    let infowindow = new google.maps.InfoWindow()
-
-    // ========================Icon examples=========================
-    let icon = {
-      path: Con.svg_lust,
-      fillColor: '#ff9900',
-      fillOpacity: 1,
-      anchor: new google.maps.Point(250,250),
-      strokeWeight: 0, 
-      scale: .1
-    }
-          
-    let icon2 = {
-      path: Con.svg_gluttony,
-      fillColor: '#ff9900',
-      fillOpacity: 1,
-      anchor: new google.maps.Point(250,250),
-      strokeWeight: 0, 
-      scale: .1
-    }
-
-    let icon3 = {
-      path: Con.svg_neutral,
-      fillColor: '#ff9900',
-      fillOpacity: 1,
-      anchor: new google.maps.Point(250,250),
-      strokeWeight: 0, 
-      scale: .1
-    }
-          
-    let icon4 = {
-      path: Con.svg_positive,
-      fillColor: '#ff9900',
-      fillOpacity: 1,
-      anchor: new google.maps.Point(250,250),
-      strokeWeight: 0, 
-      scale: .1
-    }
-
-    let icon5 = {
-      path: Con.svg_negative,
-      fillColor: '#ff9900',
-      fillOpacity: 1,
-      anchor: new google.maps.Point(250,250),
-      strokeWeight: 0, 
-      scale: .1
-    }
-
-    let myFoodMark = {lat: -37.8036, lng: 144.9631}
-    let myLustMark = {lat: -37.8136, lng: 144.9631}
-    let myNormalMark = {lat: -37.8036, lng: 144.9531}
-    let myPositiveMark = {lat: -37.8136, lng: 144.9731}
-    let myNegativeMark = {lat: -37.8236, lng: 144.9631}
-
-    let foodMark = new google.maps.Marker({
-      position: myFoodMark,
-      map: map,
-      animation: google.maps.Animation.BOUNCE,
-      title: 'Hello Food!',
-      icon: icon2
-    })
-
-    let lustMark = new google.maps.Marker({
-      position: myLustMark,
-      map: map,
-      animation: google.maps.Animation.BOUNCE,
-      title: 'Hello Lust!',
-      icon: icon
-    })
-
-    let warthMark = new google.maps.Marker({
-      position: myNormalMark,
-      map: map,
-      animation: google.maps.Animation.BOUNCE,
-      title: 'Hello Normal!',
-      icon: icon3
-    })
-
-    let positiveMark = new google.maps.Marker({
-      position: myPositiveMark,
-      map: map,
-      animation: google.maps.Animation.BOUNCE,
-      title: 'Hello Positive!',
-      icon: icon4
-    })
-
-    let negativeMark = new google.maps.Marker({
-      position: myNegativeMark,
-      map: map,
-      animation: google.maps.Animation.BOUNCE,
-      title: 'Hello Negative!',
-      icon: icon5
-    })
-
-    positiveMark.addListener('click', function() {
-      let content = '<div id="content" style="min-width:150px;">'+
-                    '<p>Tags</p>'+
-                    '<button class="btn btn-primary btn-dark">positive</button>'+
-                    '<button class="btn btn-primary btn-warning">positive</button>'+
-                    '<button class="btn btn-primary">positive</button>'+
-                    '</div>';
-      
-      infowindow.setContent(content)
-      infowindow.open(map, positiveMark)
-    })
   }
 
-  mapBuild = (type) =>{
+  mapBuild = (url) =>{
     let map = new google.maps.Map(document.getElementById('map_canvas'), {
       zoom: 12,
       center:  {lat: -37.7998, lng: 144.9460},
@@ -284,10 +167,10 @@ export default class Map extends Component{
 
     // set style for each region
 
-    map.data.loadGeoJson(this.melb_geo)
+    map.data.loadGeoJson(url)
 
     map.data.setStyle((feature) => {
-      let total = feature.getProperty(type)
+      let total = feature.getProperty(this.state.searchFactor)
       let name = feature.getProperty('name')
 
       if (!this.barDataLabel.includes(name)){
@@ -397,11 +280,33 @@ export default class Map extends Component{
     })
   }
 
-  getRelationData = (factor) => {
-    axios.Get('api/')
+  getRelationData = (url) => {
+    axios.Get(url)
     .then((response)=>{
       console.log(response.data)
     })
+  }
+
+  getFactor = (value) =>{
+    console.log(value)
+    this.setState({
+      searchFactor: value
+    })
+  }
+
+  getDateTime = (date, dateString) =>{
+    let startTime = new Date(dateString[0])
+    let endTime = new Date(dateString[1])
+    this.setState({
+      startTime: startTime.getTime(),
+      endTime: endTime.getTime()
+    })
+  }
+
+  search = () =>{
+    let url = `/api/statistics/zone/melbourn/begintime=${this.state.startTime}/endtime=${this.state.endTime}`;
+    // this.getRelationData(url)
+    this.mapBuild(url)
   }
 
   render(){
@@ -412,12 +317,27 @@ export default class Map extends Component{
             {/* <loading :active.sync="visible" :can-cancel="true"></loading> */}
             <div id="map_canvas" style={{height:"90vh", width:'100%'}} ></div>  
             <div id="searchBar"> 
-              <h2>General Search</h2>
+            <Select
+              style={{ width: 200 }}
+              placeholder="Select a factor"
+              optionFilterProp="children"
+              onChange={this.getFactor}
+              filterOption={(input, option) =>
+                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+              }
+            >
+              <Option value="attention">Covid_Attention</Option>
+              <Option value="lucy">Lucy</Option>
+              <Option value="tom">Tom</Option>
+            </Select>
+            <DatePicker.RangePicker style={{marginLeft:'10px'}} onChange={this.getDateTime}/>
+            <Button type="primary" style={{marginLeft:'10px'}} icon={<SearchOutlined />} onClick={this.search}> Search</Button>
             </div>
           </div>
           <div style={{height:'500px',width:'100%'}}>
             <div id="forms" style={{width:'650px',height:'350px'}}></div>
           </div>
+
       </div>
     )
   }
