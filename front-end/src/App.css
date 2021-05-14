@@ -1,0 +1,10 @@
+
+#searchBar {
+  background-color:#ff9900;
+  position: absolute; 
+  top: 100px; 
+  right: 20px; 
+  z-index: 9999; 
+  border-radius: 25px;
+  width: 320px;
+}
