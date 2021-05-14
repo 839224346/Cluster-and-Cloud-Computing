@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import { mapStyle } from './resource/map-style'
 import { Con } from './resource/const'
 import { Select } from 'antd'
+import InfoWindow from './InfoWindow'
 
 import * as echarts from 'echarts'
 
@@ -185,7 +186,6 @@ export default class Map extends Component{
     this.barDataLabel.length=0
     this.barData.length=0
 
-    // ======================== Setup each region/ Collect bar data ==========================
     // set style for each region
 
     map.data.loadGeoJson(this.melb_geo)
@@ -281,22 +281,8 @@ export default class Map extends Component{
           }
         ]
       }
-      
-      // init infowindow with customized view
-      let InfoWindow = Vue.extend(InfoWindowComponent)
-      
-      // send data to the view
-      let instance = new InfoWindow({
-        propsData: {
-          name,
-          pieDatacollection_sentiment,
-          pieDatacollection
-        }
-      })
-      
-      instance.$mount()
 
-      infowindow.setContent(instance.$el)
+      infowindow.setContent(<InfoWindow />)
       //infowindow.setPosition(event.feature.getGeometry().getAt(0).getAt(0).getAt(0))
       infowindow.setPosition(event.latLng)
       //infowindow.setOptions({pixelOffset: new google.maps.Size(0,0)})
