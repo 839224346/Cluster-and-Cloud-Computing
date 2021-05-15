@@ -210,4 +210,4 @@ def queryRelationship():
 
 
 
-server.run(port = 6100,debug = True,host = '0.0.0.0',threaded = True)
+server.run(port = 3000,debug = True,host = '0.0.0.0',threaded = True)
