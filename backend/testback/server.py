@@ -3,8 +3,10 @@ import requests
 import flask,json
 from flask import request
 from collections import Counter
+from flask_cors import CORS
 
 server = flask.Flask(__name__)
+CORS(server, resources=r'/*')
 
 
 @server.route('/api/statistics/zone/melbourn',methods=['get'])
@@ -210,4 +212,4 @@ def queryRelationship():
 
 
 
-server.run(port = 3000,debug = True,host = '0.0.0.0',threaded = True)
+server.run(port = 6100,debug = True,host = '0.0.0.0',threaded = True)
