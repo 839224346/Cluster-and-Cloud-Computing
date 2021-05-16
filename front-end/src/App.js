@@ -6,13 +6,24 @@ import { Con } from './resource/const'
 import { Select, DatePicker, Button } from 'antd'
 import { SearchOutlined } from '@ant-design/icons'
 import InfoWindow from './InfoWindow'
-import axios from 'react-axios'
+import request from "./util/request"
+// import axios from 'react-axios'
 import * as echarts from 'echarts'
 import 'antd/dist/antd.css'
+import ReactDOMServer from 'react-dom/server';
 
 
+const InfoContent = (
+  <div>
+    dsadsadasdsadas
+  </div>
+)
+
+// const axios = require('axios');
 export default class Map extends Component{
 
+  barData = []
+  barDataLabel= []
   constructor(props) {
     super(props)
     this.state = {
@@ -147,15 +158,45 @@ export default class Map extends Component{
     })
   }
 
+  rgbToHex =(r, g, b)=> {
+    var hex = ((r<<16) | (g<<8) | b).toString(16);
+    return "#" + new Array(Math.abs(hex.length-7)).join("0") + hex;
+  }
+
+  hexToRgb =(hex) =>{
+    var rgb = [];
+    for(var i=1; i<7; i+=2){
+      rgb.push(parseInt("0x" + hex.slice(i,i+2)));
+    }
+    return rgb;
+  }
+
+  gradient =(startColor,endColor,step)=> {
+    var sColor = this.hexToRgb(startColor),
+        eColor = this.hexToRgb(endColor);
+
+    var rStep = (eColor[0] - sColor[0]) / step,
+        gStep = (eColor[1] - sColor[1]) / step,
+        bStep = (eColor[2] - sColor[2]) / step;
+
+    var gradientColorArr = [];
+    for(var i=0;i<step;i++){
+        gradientColorArr.push(this.rgbToHex(parseInt(rStep*i+sColor[0]),parseInt(gStep*i+sColor[1]),parseInt(bStep*i+sColor[2])));
+    }
+    return gradientColorArr;
+  }
+
   mapBuild = (url) =>{
     let map = new google.maps.Map(document.getElementById('map_canvas'), {
-      zoom: 12,
+      zoom: 9,
       center:  {lat: -37.7998, lng: 144.9460},
       disableDefaultUI: true,
       styles: mapStyle
     })
 
-    let infowindow = new google.maps.InfoWindow()
+    let infowindow = new google.maps.InfoWindow({
+      content : ''
+    })
     let marker, i
     let markers = []
     let locations = []
@@ -170,6 +211,8 @@ export default class Map extends Component{
     map.data.loadGeoJson(url)
 
     map.data.setStyle((feature) => {
+
+      console.log('feature',feature)
       let total = feature.getProperty(this.state.searchFactor)
       let name = feature.getProperty('name')
 
@@ -194,7 +237,7 @@ export default class Map extends Component{
         color = colors[6]  
 
       return {
-        fillColor: "#ff9900",
+        fillColor: color,
         fillOpacity: 0.7,
         strokeWeight: 1
       }
@@ -216,56 +259,57 @@ export default class Map extends Component{
       console.log('sd',event)
       // prepare data
       let name = event.feature.getProperty("name")
-      let statistics = event.feature.getProperty("statistcs")
+      // let statistics = event.feature.getProperty("statistcs")
 
-      let infoPieDataSentiment = [] 
-      let infoPieNameSentiment = []
-      let infoPieData = []
-      let infoPieName = []
-      let temp = 'sentiment'
+      // let infoPieDataSentiment = [] 
+      // let infoPieNameSentiment = []
+      // let infoPieData = []
+      // let infoPieName = []
+      // let temp = 'sentiment'
 
-      for (const [key, value] of Object.entries(statistics.sentiment)) {
-        infoPieNameSentiment.push(key)
-        infoPieDataSentiment.push(value)
-      }
+      // for (const [key, value] of Object.entries(statistics.sentiment)) {
+      //   infoPieNameSentiment.push(key)
+      //   infoPieDataSentiment.push(value)
+      // }
 
-      for (const [key, value] of Object.entries(statistics)) {
-        if (key != temp){
-          for(const [inner_key, inner_value] of Object.entries(value)) {
-            infoPieName.push(inner_key)
-            infoPieData.push(inner_value)
-          }
-        }
-      }
+      // for (const [key, value] of Object.entries(statistics)) {
+      //   if (key != temp){
+      //     for(const [inner_key, inner_value] of Object.entries(value)) {
+      //       infoPieName.push(inner_key)
+      //       infoPieData.push(inner_value)
+      //     }
+      //   }
+      // }
 
-      // set all chart data here
-      let pieDatacollection_sentiment = {
-        labels: infoPieNameSentiment,
-        datasets: [
-          {
-            label: 'Sentiment',
-            backgroundColor: this.gradient('#F5F5F5','ff9900',infoPieDataSentiment.length) ,
-            data: infoPieDataSentiment
-          }
-        ]
-      }
+      // // set all chart data here
+      // let pieDatacollection_sentiment = {
+      //   labels: infoPieNameSentiment,
+      //   datasets: [
+      //     {
+      //       label: 'Sentiment',
+      //       backgroundColor: this.gradient('#F5F5F5','ff9900',infoPieDataSentiment.length) ,
+      //       data: infoPieDataSentiment
+      //     }
+      //   ]
+      // }
 
-      let pieDatacollection = {
-        labels: infoPieName,
-        datasets: [
-          {
-            label: 'Sin',
-            backgroundColor: this.gradient('#F5F5F5','ff9900',infoPieData.length) ,
-            data: infoPieData
-          }
-        ]
-      }
+      // let pieDatacollection = {
+      //   labels: infoPieName,
+      //   datasets: [
+      //     {
+      //       label: 'Sin',
+      //       backgroundColor: this.gradient('#F5F5F5','ff9900',infoPieData.length) ,
+      //       data: infoPieData
+      //     }
+      //   ]
+      // }
 
-      infowindow.setContent(<InfoWindow />)
+      infowindow.setContent(ReactDOMServer.renderToString(<InfoWindow name={name}/>))
       //infowindow.setPosition(event.feature.getGeometry().getAt(0).getAt(0).getAt(0))
       infowindow.setPosition(event.latLng)
       //infowindow.setOptions({pixelOffset: new google.maps.Size(0,0)})
       infowindow.open(map)
+      this.initArea()
     })
     
     // mouse over event: highlight color
@@ -280,8 +324,58 @@ export default class Map extends Component{
     })
   }
 
+  initArea = () => {
+    var chartDom = document.getElementById('main');
+var myChart = echarts.init(chartDom);
+var option;
+
+option = {
+    tooltip: {
+        trigger: 'item'
+    },
+    legend: {
+        top: '5%',
+        left: 'center'
+    },
+    series: [
+        {
+            name: '访问来源',
+            type: 'pie',
+            radius: ['40%', '70%'],
+            avoidLabelOverlap: false,
+            label: {
+                show: false,
+                position: 'center'
+            },
+            emphasis: {
+                label: {
+                    show: true,
+                    fontSize: '40',
+                    fontWeight: 'bold'
+                }
+            },
+            labelLine: {
+                show: false
+            },
+            data: [
+                {value: 1048, name: '搜索引擎'},
+                {value: 735, name: '直接访问'},
+                {value: 580, name: '邮件营销'},
+                {value: 484, name: '联盟广告'},
+                {value: 300, name: '视频广告'}
+            ]
+        }
+    ]
+};
+
+option && myChart.setOption(option);
+  }
+
   getRelationData = (url) => {
-    axios.Get(url)
+
+    //api/statistics/relationship
+    const params = {"begintime":"1616194716000","endtime":"1620601116000","lga_id":[20660,22170,22670]}
+    request.post("/api/statistics/relationship", params)
     .then((response)=>{
       console.log(response.data)
     })
@@ -304,8 +398,9 @@ export default class Map extends Component{
   }
 
   search = () =>{
-    let url = `/api/statistics/zone/melbourn/begintime=${this.state.startTime}/endtime=${this.state.endTime}`;
-    // this.getRelationData(url)
+    let url = "http://0.0.0.0:6100/api/statistics/zone/melbourn?begintime=1616194716000&&endtime=1620601116000"
+    // let url = `api/statistics/zone/melbourn/begintime=${this.state.startTime}/endtime=${this.state.endTime}`;
+    this.getRelationData(url)
     this.mapBuild(url)
   }
 
@@ -326,9 +421,10 @@ export default class Map extends Component{
                 option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
               }
             >
-              <Option value="attention">Covid_Attention</Option>
-              <Option value="lucy">Lucy</Option>
-              <Option value="tom">Tom</Option>
+              <Option value="covid_attention">Covid_Attention</Option>
+              <Option value="GP_num">GP_num</Option>
+              <Option value="level_advanced">level_advanced</Option>
+              <Option value="Education">Education</Option>
             </Select>
             <DatePicker.RangePicker style={{marginLeft:'10px'}} onChange={this.getDateTime}/>
             <Button type="primary" style={{marginLeft:'10px'}} icon={<SearchOutlined />} onClick={this.search}> Search</Button>

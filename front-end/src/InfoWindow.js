@@ -1,23 +1,41 @@
-import React, { Component } from 'react';
+import React from 'react';
+import * as echarts from 'echarts';
 
-export default class InfoWindow extends Component{
-    constructor(props){
-        super(props)
-        this.state = {
-            nil : ''
-        }
-    }
-    render(){
-        return(
-            <template>
-            <div style={{maxHeight:'1000px',weight:'250px',minWidth:'250px',textAlign:'center'}}>
-            <h4>{this.props.name}</h4>
 
-                <h4></h4>
+function InfoWindow(props){
+    const words = [
+        {
+          text: 'told',
+          value: 64,
+        },
+        {
+          text: 'mistake',
+          value: 11,
+        },
+        {
+          text: 'thought',
+          value: 16,
+        },
+        {
+          text: 'bad',
+          value: 17,
+        },
+      ]
 
-                <h4></h4>
-            </div>
-            </template>
-        )
-    }
+    const content = (
+        <div style={{maxHeight:'1000px', weight:'250px', minWidth:'250px', textAlign:'center'}}>
+            <h4>{props.name}</h4>
+            <div>covid_attention</div>
+            <div>averg_income</div>
+            <div>GP_num</div>
+            <div>level_advanced</div>
+            <div>Education_rank</div>
+            <div id="main" style={{height:'300px',width:'300px'}}></div>
+            {/* <ReactWordcloud words={words} /> */}
+        </div>
+    )
+    
+    return content
 }
+
+export default InfoWindow
