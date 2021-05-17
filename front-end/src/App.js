@@ -3,7 +3,8 @@ import './App.css';
 import React, { Component } from 'react';
 import { mapStyle } from './resource/map-style'
 import { Con } from './resource/const'
-import { Select, DatePicker, Button, Row, Col } from 'antd'
+import {CityList} from './resource/city_list'
+import { Select, DatePicker, Button, Row, Col, Layout,Sider,Menu ,Form,Input} from 'antd'
 import Charts from './charts'
 import { SearchOutlined } from '@ant-design/icons'
 import InfoWindow from './InfoWindow'
@@ -24,7 +25,8 @@ export default class Map extends Component{
       searchContent: "",
       searchFactor:'',
       startTime:0,
-      endTime:0
+      endTime:0,
+      isShowMap: true
     }
   }
 
@@ -287,13 +289,18 @@ export default class Map extends Component{
     })
   }
 
-  getDateTime = (date, dateString) =>{
-    let startTime = new Date(dateString[0])
-    let endTime = new Date(dateString[1])
-    this.setState({
-      startTime: startTime.getTime(),
-      endTime: endTime.getTime()
-    })
+  getDateTime = (type) => (date, dateString) =>{
+    let time = new Date(dateString)
+    if(type === 'startTime'){
+      this.setState({
+        startTime: time.getTime()
+      })
+    }else if(type==='endTime'){
+      this.setState({
+        endTime: time.getTime()
+      })
+    }
+
   }
 
   search = () =>{
@@ -302,34 +309,92 @@ export default class Map extends Component{
     this.getRelationData(url)
     this.mapBuild(url)
   }
+  show = () => {
+    if(this.state.isShowMap){
+      this.setState({
+        isShowMap : false
+      })
+    }else {
+      this.setState({
+        isShowMap : true
+      })
+    }
 
+  }
   render(){
     const {Option} = Select;
     return(
       <div>
+        <Layout>
+          <Layout.Sider style={{backgroundColor:'#f0f2f5'}} width='275'>
+            <Menu  mode="inline" defaultOpenKeys={['sub1']} style={{backgroundColor:'#f0f2f5'}}>
+            {/* <Menu.SubMenu key="sub1" title="Navigation One" > */}
+              <Form
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 14 }}
+                layout="horizontal"
+              >
+                <Form.Item label="factor">
+                <Select
+                  style={{ width: 200 }}
+                  placeholder="Select a factor"
+                  optionFilterProp="children"
+                  onChange={this.getFactor}
+                  filterOption={(input, option) =>
+                    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                  }
+                >
+                  <Option value="covid_attention">Covid Attention</Option>
+                  <Option value="GP_num">GP Number</Option>
+                  <Option value="level_advanced">Level Advanced</Option>
+                  <Option value="Education">Education</Option>
+                </Select>
+                </Form.Item>
+                <Form.Item label="city">
+                <Select
+                  style={{ width: 200 ,maxHeight:100}}
+                  placeholder="Select a city"
+                  optionFilterProp="children"
+                  mode="multiple"
+                  onChange={this.getCity}
+                  filterOption={(input, option) =>
+                    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                  }
+                >
+                  {Object.keys(CityList).map((key)=>{
+                    return <Option value={key}>{CityList[key]}</Option>
+                  })}
+                  <Option value="covid_attention">Covid Attention</Option>
+                  <Option value="GP_num">GP Number</Option>
+                  <Option value="level_advanced">Level Advanced</Option>
+                  <Option value="Education">Education</Option>
+                </Select>
+                </Form.Item>
+                <Form.Item label="beginDate">
+                  <DatePicker size={'default'} picker="month" onChange={this.getDateTime('startTime')}/>
+                </Form.Item>
+                <Form.Item label="endDate">
+                  <DatePicker size={'default'} picker="month" onChange={this.getDateTime('endTime')}/>
+                </Form.Item>
+                <Form.Item>
+                  <Button onClick={this.search}>Search</Button>
+                </Form.Item>
+                <Form.Item>
+                <Button onClick={this.show}>{this.state.isShowMap ? 'Show' : 'Back'}</Button>
+                </Form.Item>
+              </Form>
+            {/* </Menu.SubMenu> */}
+            </Menu>
+          </ Layout.Sider>
+          <Layout.Content>
           <div id="gmap">
             {/* <loading :active.sync="visible" :can-cancel="true"></loading> */}
-            <div id="map_canvas" style={{height:"90vh", width:'100%'}} ></div>  
-            <div id="searchBar"> 
-            <Select
-              style={{ width: 200 }}
-              placeholder="Select a factor"
-              optionFilterProp="children"
-              onChange={this.getFactor}
-              filterOption={(input, option) =>
-                option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-              }
-            >
-              <Option value="covid_attention">Covid Attention</Option>
-              <Option value="GP_num">GP Number</Option>
-              <Option value="level_advanced">Level Advanced</Option>
-              <Option value="Education">Education</Option>
-            </Select>
-            <DatePicker.RangePicker style={{marginLeft:'10px'}} onChange={this.getDateTime}/>
-            <Button type="primary" style={{marginLeft:'10px'}} onClick={this.search}> Search</Button>
-            </div>
+            <div id="map_canvas" style={this.state.isShowMap ? { height:"100vh", width:'100%'}: { height:"0vh", width:'100%'}} ></div>  
           </div>
-          <Charts />
+          {!this.state.isShowMap && <Charts />}
+          </Layout.Content>
+
+          </Layout>
       </div>
     )
   }
