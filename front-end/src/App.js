@@ -3,7 +3,8 @@ import './App.css';
 import React, { Component } from 'react';
 import { mapStyle } from './resource/map-style'
 import { Con } from './resource/const'
-import { Select, DatePicker, Button } from 'antd'
+import { Select, DatePicker, Button, Row, Col } from 'antd'
+import Charts from './charts'
 import { SearchOutlined } from '@ant-design/icons'
 import InfoWindow from './InfoWindow'
 import request from "./util/request"
@@ -13,13 +14,6 @@ import 'antd/dist/antd.css'
 import ReactDOMServer from 'react-dom/server';
 
 
-const InfoContent = (
-  <div>
-    dsadsadasdsadas
-  </div>
-)
-
-// const axios = require('axios');
 export default class Map extends Component{
 
   barData = []
@@ -37,117 +31,9 @@ export default class Map extends Component{
   componentDidMount(){
     this.initMap();
     // this.getRelationData();
-    this.initEchats();
+    // this.initEchats();
   }
 
-  initEchats = (relationData) =>{
-    // const lga_name = relationData.lga_name;
-    // const {score, GP_num, education_rank, population_num,averg_income, averg_age, homeless_rate} = relationData.factor;
-    var myChart = echarts.init(document.getElementById('forms'));
-    let option;
-    option = {
-        tooltip: {
-            trigger: 'axis',
-            axisPointer: {            // 坐标轴指示器，坐标轴触发有效
-                type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
-            }
-        },
-        legend: {
-            data: ['Emotion', 'GP', 'Education', 'Population', 'Income', 'Age', "Homeless"]
-        },
-        grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
-        },
-        xAxis: [
-            {
-                type: 'category',
-                data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-            }
-        ],
-        yAxis: [
-            {
-                type: 'value'
-            }
-        ],
-        series: [
-            {
-                name: 'Emotion',
-                type: 'bar',
-                emphasis: {
-                    focus: 'series'
-                },
-                data: [320, 332, 301, 334, 390, 330, 320]
-            },
-            {
-                name: 'GP',
-                type: 'bar',
-                // stack: '广告',
-                emphasis: {
-                    focus: 'series'
-                },
-                data: [120, 132, 101, 134, 90, 230, 210]
-            },
-            {
-                name: 'Education',
-                type: 'bar',
-                // stack: '广告',
-                emphasis: {
-                    focus: 'series'
-                },
-                data: [220, 182, 191, 234, 290, 330, 310]
-            },
-            {
-                name: 'Population',
-                type: 'bar',
-                // stack: '广告',
-                emphasis: {
-                    focus: 'series'
-                },
-                data: [150, 232, 201, 154, 190, 330, 410]
-            },
-            {
-                name: 'Income',
-                type: 'bar',
-                data: [862, 1018, 964, 1026, 1679, 1600, 1570],
-                emphasis: {
-                    focus: 'series'
-                },
-                // markLine: {
-                //     lineStyle: {
-                //         type: 'dashed'
-                //     },
-                //     data: [
-                //         [{type: 'min'}, {type: 'max'}]
-                //     ]
-                // }
-            },
-            {
-                name: 'Age',
-                type: 'bar',
-                barWidth: 5,
-                // stack: '搜索引擎',
-                emphasis: {
-                    focus: 'series'
-                },
-                data: [620, 732, 701, 734, 1090, 1130, 1120]
-            },
-            {
-                name: 'Homeless',
-                type: 'bar',
-                // stack: '搜索引擎',
-                emphasis: {
-                    focus: 'series'
-                },
-                data: [120, 132, 101, 134, 290, 230, 220]
-            }
-        ]
-    };
-    // 绘制图表
-    myChart.setOption(option);
-  }
 
   initMap = () => {
     let map = new google.maps.Map(document.getElementById('map_canvas'), {
@@ -427,13 +313,10 @@ option && myChart.setOption(option);
               <Option value="Education">Education</Option>
             </Select>
             <DatePicker.RangePicker style={{marginLeft:'10px'}} onChange={this.getDateTime}/>
-            <Button type="primary" style={{marginLeft:'10px'}} icon={<SearchOutlined />} onClick={this.search}> Search</Button>
+            <Button type="primary" style={{marginLeft:'10px'}} onClick={this.search}> Search</Button>
             </div>
           </div>
-          <div style={{height:'500px',width:'100%'}}>
-            <div id="forms" style={{width:'650px',height:'350px'}}></div>
-          </div>
-
+          <Charts />
       </div>
     )
   }
