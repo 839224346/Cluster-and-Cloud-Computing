@@ -142,9 +142,18 @@ export default class Map extends Component{
 
     // mouse click event: show grid info
     map.data.addListener('click', (event) => {
-      console.log('sd',event)
+      let key_words = event.feature.getProperty('key_words')
+      let params = {}
+      params.name = event.feature.getProperty('name')
+      params.GP_num = event.feature.getProperty('GP_num')
+      params.Education = event.feature.getProperty('Education')
+      params.covid_attention = event.feature.getProperty('covid_attention')
+      params.level_advanced = event.feature.getProperty('level_advanced')
+      params.population = event.feature.getProperty('population')
       // prepare data
-      let name = event.feature.getProperty("name")
+      console.log(params)
+
+
       // let statistics = event.feature.getProperty("statistcs")
 
       // let infoPieDataSentiment = [] 
@@ -190,12 +199,13 @@ export default class Map extends Component{
       //   ]
       // }
 
-      infowindow.setContent(ReactDOMServer.renderToString(<InfoWindow name={name}/>))
+      infowindow.setContent(ReactDOMServer.renderToString(<InfoWindow params={params}/>))
       //infowindow.setPosition(event.feature.getGeometry().getAt(0).getAt(0).getAt(0))
       infowindow.setPosition(event.latLng)
       //infowindow.setOptions({pixelOffset: new google.maps.Size(0,0)})
       infowindow.open(map)
-      this.initArea()
+
+      this.initArea(key_words)
     })
     
     // mouse over event: highlight color
@@ -210,51 +220,54 @@ export default class Map extends Component{
     })
   }
 
-  initArea = () => {
-    var chartDom = document.getElementById('main');
-var myChart = echarts.init(chartDom);
-var option;
+  initArea = (key_words) => {
+    var chartDom = document.getElementById('infoChart');
+    var myChart = echarts.init(chartDom);
+    var option;
+    let length = key_words.length;
+    let chatData = [];
+    key_words.forEach((item)=>{
+      let obj = {};
+      obj.name = item.text;
+      obj.value = item.value;
+      chatData.push(obj)
+    })
+    console.log(chatData)
 
-option = {
-    tooltip: {
-        trigger: 'item'
-    },
-    legend: {
-        top: '5%',
-        left: 'center'
-    },
-    series: [
-        {
-            name: '访问来源',
-            type: 'pie',
-            radius: ['40%', '70%'],
-            avoidLabelOverlap: false,
-            label: {
-                show: false,
-                position: 'center'
-            },
-            emphasis: {
+    option = {
+        tooltip: {
+            trigger: 'item'
+        },
+        legend: {
+            top: '5%',
+            left: 'center'
+        },
+        series: [
+            {
+                name: 'Major Emotions',
+                type: 'pie',
+                radius: ['20%', '50%'],
+                avoidLabelOverlap: false,
                 label: {
-                    show: true,
-                    fontSize: '40',
-                    fontWeight: 'bold'
-                }
-            },
-            labelLine: {
-                show: false
-            },
-            data: [
-                {value: 1048, name: '搜索引擎'},
-                {value: 735, name: '直接访问'},
-                {value: 580, name: '邮件营销'},
-                {value: 484, name: '联盟广告'},
-                {value: 300, name: '视频广告'}
-            ]
-        }
-    ]
-};
+                    show: false,
+                    position: 'center'
+                },
+                emphasis: {
+                    label: {
+                        show: false,
+                        fontSize: '40',
+                        fontWeight: 'bold'
+                    }
+                },
+                labelLine: {
+                    show: false
+                },
+                data: chatData
+            }
+        ]
+    };
 
-option && myChart.setOption(option);
+    option && myChart.setOption(option);
   }
 
   getRelationData = (url) => {
@@ -307,9 +320,9 @@ option && myChart.setOption(option);
                 option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
               }
             >
-              <Option value="covid_attention">Covid_Attention</Option>
-              <Option value="GP_num">GP_num</Option>
-              <Option value="level_advanced">level_advanced</Option>
+              <Option value="covid_attention">Covid Attention</Option>
+              <Option value="GP_num">GP Number</Option>
+              <Option value="level_advanced">Level Advanced</Option>
               <Option value="Education">Education</Option>
             </Select>
             <DatePicker.RangePicker style={{marginLeft:'10px'}} onChange={this.getDateTime}/>
