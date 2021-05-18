@@ -26,7 +26,8 @@ export default class Map extends Component{
       endTime:0,
       isShowMap: true,
       emotionData:[],
-      relationData:{}
+      relationData:{},
+      cityList: []
     }
   }
 
@@ -330,10 +331,15 @@ export default class Map extends Component{
     }
 
   }
+  getCity = (value) =>{
+    this.setState({
+      cityList: value
+    })
+  }
 
   search = () =>{
-    let url = "http://0.0.0.0:6100/api/statistics/zone/melbourn?begintime=1616194716000&&endtime=1620601116000"
-    // let url = `api/statistics/zone/melbourn/begintime=${this.state.startTime}/endtime=${this.state.endTime}`;
+    // let url = "http://0.0.0.0:6100/api/statistics/zone/melbourn?begintime=1616194716000&&endtime=1620601116000"
+    let url = `api/statistics/zone/melbourn/begintime=${this.state.startTime}/endtime=${this.state.endTime}`;
     this.mapBuild(url)
   }
   show = () => {
@@ -420,7 +426,13 @@ export default class Map extends Component{
             {/* <loading :active.sync="visible" :can-cancel="true"></loading> */}
             <div id="map_canvas" style={this.state.isShowMap ? { height:"100vh", width:'100%'}: { height:"0vh", width:'100%'}} ></div>  
           </div>
-          {!this.state.isShowMap && <Charts emotionData={this.state.emotionData} relationData={this.state.relationData}/>}
+          {!this.state.isShowMap && <Charts 
+                                      emotionData={this.state.emotionData}
+                                      relationData={this.state.relationData} 
+                                      cityList = {this.state.cityList}
+                                      startTime = {this.state.startTime}
+                                      endTime = {this.state.endTime}
+                                      />}
           </Layout.Content>
 
           </Layout>

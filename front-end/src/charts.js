@@ -32,9 +32,9 @@ export default class Charts extends Component{
     }
 
     getRelationData = (url) => {
-
+        let {cityList, startTime, endTime} = this.props
         //api/statistics/relationship
-        const params = {"begintime":"1616194716000","endtime":"1620601116000","lga_id":[20660,22170,22670]}
+        const params = {"begintime":startTime + '',"endtime":endTime+'',"lga_id":cityList}
         request.post("/api/statistics/relationship", params)
         .then((response)=>{
           console.log('response.data', response.data)
@@ -46,7 +46,8 @@ export default class Charts extends Component{
       }
     
     getEmotionData = () => {
-    const params = {"begintime":"1616194716000","endtime":"1620601116000","lga_id":[20660,22170,22670]}
+    let {cityList, startTime, endTime} = this.props
+    const params = {"begintime":startTime + '',"endtime":endTime+'',"lga_id":cityList}
     request.post("/api/statistics/lgaEmotion",params)
     .then((response)=>{
         console.log(response.data.data)
@@ -207,7 +208,7 @@ export default class Charts extends Component{
                     emphasis: {
                         focus: 'series'
                     },
-                    data: [320, 332, 301]
+                    data: this.state.relationData.emotion_score
                 },
                 {
                     name: 'Tweet Number',
@@ -215,7 +216,7 @@ export default class Charts extends Component{
                     emphasis: {
                         focus: 'series'
                     },
-                    data: [120, 132, 101]
+                    data: this.state.relationData.tweet_num
                 },
                 {
                     name: type,
@@ -223,7 +224,7 @@ export default class Charts extends Component{
                     emphasis: {
                         focus: 'series'
                     },
-                    data: [220, 182, 191]
+                    data: this.state.relationData.type
                 }
             ]
         };
@@ -236,19 +237,19 @@ export default class Charts extends Component{
         var myChart = echarts.init(chartDom);
         var option;
 
-        var data = [{"name": "melb", "children": [{"name": "Banyule", "value": 10, "children": [{"name": "positive", "value": 3,
-        "children": [{"name": "subjective", "value":2}, {"name": "objective", "value": 5}]}, {"name": "neutral", "value": 20,
-        "children": [{"name": "subjective", "value": 5}, {"name": "objective", "value": 6}]}, {"name": "negative", "value": 0,
-        "children": [{"name": "subjective", "value": 0}, {"name": "objective", "value": 0}]}]}, {"name": "Frankston", "value":
-        20, "children": [{"name": "positive", "value": 0, "children": [{"name": "subjective", "value": 0}, {"name": "objective",
-        "value": 0}]}, {"name": "neutral", "value": 0, "children": [{"name": "subjective", "value": 0}, {"name": "objective",
-        "value": 0}]}, {"name": "negative", "value": 0, "children": [{"name": "subjective", "value": 0}, {"name": "objective",
-        "value": 0}]}]}, {"name": "Greater Dandenong", "value": 0, "children": [{"name": "positive", "value": 0, "children":
-        [{"name": "subjective", "value": 0}, {"name": "objective", "value": 0}]}, {"name": "neutral", "value": 0, "children":
-        [{"name": "subjective", "value": 0}, {"name": "objective", "value": 0}]}, {"name": "negative", "value": 0, "children":
-        [{"name": "subjective", "value": 0}, {"name": "objective", "value": 0}]}]}]}]
+        // var data = [{"name": "melb", "children": [{"name": "Banyule", "value": 10, "children": [{"name": "positive", "value": 3,
+        // "children": [{"name": "subjective", "value":2}, {"name": "objective", "value": 5}]}, {"name": "neutral", "value": 20,
+        // "children": [{"name": "subjective", "value": 5}, {"name": "objective", "value": 6}]}, {"name": "negative", "value": 0,
+        // "children": [{"name": "subjective", "value": 0}, {"name": "objective", "value": 0}]}]}, {"name": "Frankston", "value":
+        // 20, "children": [{"name": "positive", "value": 0, "children": [{"name": "subjective", "value": 0}, {"name": "objective",
+        // "value": 0}]}, {"name": "neutral", "value": 0, "children": [{"name": "subjective", "value": 0}, {"name": "objective",
+        // "value": 0}]}, {"name": "negative", "value": 0, "children": [{"name": "subjective", "value": 0}, {"name": "objective",
+        // "value": 0}]}]}, {"name": "Greater Dandenong", "value": 0, "children": [{"name": "positive", "value": 0, "children":
+        // [{"name": "subjective", "value": 0}, {"name": "objective", "value": 0}]}, {"name": "neutral", "value": 0, "children":
+        // [{"name": "subjective", "value": 0}, {"name": "objective", "value": 0}]}, {"name": "negative", "value": 0, "children":
+        // [{"name": "subjective", "value": 0}, {"name": "objective", "value": 0}]}]}]}]
 
-        // var data = this.state.emotionData;
+        var data = this.state.emotionData;
 
         option = {
             visualMap: {
