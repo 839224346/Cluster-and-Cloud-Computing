@@ -2,14 +2,12 @@
 import './App.css';
 import React, { Component } from 'react';
 import { mapStyle } from './resource/map-style'
-import { Con } from './resource/const'
+// import { Con } from './resource/const'
 import {CityList} from './resource/city_list'
-import { Select, DatePicker, Button, Row, Col, Layout,Sider,Menu ,Form,Input} from 'antd'
+import { Select, DatePicker, Button, Layout,Menu ,Form} from 'antd'
 import Charts from './charts'
-import { SearchOutlined } from '@ant-design/icons'
+// import { SearchOutlined } from '@ant-design/icons'
 import InfoWindow from './InfoWindow'
-import request from "./util/request"
-// import axios from 'react-axios'
 import * as echarts from 'echarts'
 import 'antd/dist/antd.css'
 import ReactDOMServer from 'react-dom/server';
@@ -26,19 +24,18 @@ export default class Map extends Component{
       searchFactor:'',
       startTime:0,
       endTime:0,
-      isShowMap: true
+      isShowMap: true,
+      emotionData:[],
+      relationData:{}
     }
   }
 
   componentDidMount(){
     this.initMap();
-    // this.getRelationData();
-    // this.initEchats();
   }
 
-
   initMap = () => {
-    let map = new google.maps.Map(document.getElementById('map_canvas'), {
+    new google.maps.Map(document.getElementById('map_canvas'), {
       zoom: 13,
       center:  {lat: -37.7998, lng: 144.9460},
       disableDefaultUI: true,
@@ -85,9 +82,9 @@ export default class Map extends Component{
     let infowindow = new google.maps.InfoWindow({
       content : ''
     })
-    let marker, i
-    let markers = []
-    let locations = []
+    // let marker, i
+    // let markers = []
+    // let locations = []
     let colors = this.gradient('#ffffff','#ff9900',7)
    
 
@@ -152,8 +149,6 @@ export default class Map extends Component{
       params.covid_attention = event.feature.getProperty('covid_attention')
       params.level_advanced = event.feature.getProperty('level_advanced')
       params.population = event.feature.getProperty('population')
-      // prepare data
-      console.log(params)
 
 
       // let statistics = event.feature.getProperty("statistcs")
@@ -226,7 +221,6 @@ export default class Map extends Component{
     var chartDom = document.getElementById('infoChart');
     var myChart = echarts.init(chartDom);
     var option;
-    let length = key_words.length;
     let chatData = [];
     key_words.forEach((item)=>{
       let obj = {};
@@ -272,16 +266,6 @@ export default class Map extends Component{
     option && myChart.setOption(option);
   }
 
-  getRelationData = (url) => {
-
-    //api/statistics/relationship
-    const params = {"begintime":"1616194716000","endtime":"1620601116000","lga_id":[20660,22170,22670]}
-    request.post("/api/statistics/relationship", params)
-    .then((response)=>{
-      console.log(response.data)
-    })
-  }
-
   getFactor = (value) =>{
     console.log(value)
     this.setState({
@@ -306,11 +290,12 @@ export default class Map extends Component{
   search = () =>{
     let url = "http://0.0.0.0:6100/api/statistics/zone/melbourn?begintime=1616194716000&&endtime=1620601116000"
     // let url = `api/statistics/zone/melbourn/begintime=${this.state.startTime}/endtime=${this.state.endTime}`;
-    this.getRelationData(url)
     this.mapBuild(url)
   }
   show = () => {
     if(this.state.isShowMap){
+      // this.getEmotionData()
+      // this.getRelationData();
       this.setState({
         isShowMap : false
       })
@@ -391,7 +376,7 @@ export default class Map extends Component{
             {/* <loading :active.sync="visible" :can-cancel="true"></loading> */}
             <div id="map_canvas" style={this.state.isShowMap ? { height:"100vh", width:'100%'}: { height:"0vh", width:'100%'}} ></div>  
           </div>
-          {!this.state.isShowMap && <Charts />}
+          {!this.state.isShowMap && <Charts emotionData={this.state.emotionData} relationData={this.state.relationData}/>}
           </Layout.Content>
 
           </Layout>

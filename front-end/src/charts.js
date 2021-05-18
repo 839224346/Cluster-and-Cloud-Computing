@@ -1,24 +1,63 @@
 /* eslint-disable no-useless-constructor */
 import React, {Component} from 'react'
-import {Row, Col } from 'antd'
+import {Row, Col, Card } from 'antd'
 import * as echarts from 'echarts'
+import request from "./util/request"
 export default class Charts extends Component{
 
     constructor(props){
         super(props)
+        this.state = {
+            emotionData:[],
+            relationData:{}
+        }
     }
 
     componentDidMount(){
-        this.initEchats('1',"gp_chart")
-        this.initEchats('1',"education_chart")
-        this.initEchats('1',"population_chart")
-        this.initEchats('1',"income_chart")
-        this.initEchats('1',"age_chart")
-        this.initEchats('1',"homeless_chart")
-        this.initAreaEchats()
+
+        this.getRelationData()
+        this.getEmotionData()
+
     }
 
-    initEchats = (relationData, type) =>{
+    initRelationCharts = () => {
+        this.initEchats("gp_chart")
+        this.initEchats("education_chart")
+        this.initEchats("population_chart")
+        this.initEchats("income_chart")
+        this.initEchats("age_chart")
+        this.initEchats("homeless_chart")
+    }
+
+    getRelationData = (url) => {
+
+        //api/statistics/relationship
+        const params = {"begintime":"1616194716000","endtime":"1620601116000","lga_id":[20660,22170,22670]}
+        request.post("/api/statistics/relationship", params)
+        .then((response)=>{
+          console.log('response.data', response.data)
+          this.setState({
+            relationData: response.data.data
+          })
+          this.initRelationCharts()
+        })
+      }
+    
+    getEmotionData = () => {
+    const params = {"begintime":"1616194716000","endtime":"1620601116000","lga_id":[20660,22170,22670]}
+    request.post("/api/statistics/lgaEmotion",params)
+    .then((response)=>{
+        console.log(response.data.data)
+        this.setState({
+        emotionData: response.data.data
+        })
+        this.initEmotionEchats()
+    })
+    }
+
+    initEchats = (type) =>{
+        
+        const cityList = this.state.relationData.lga_name
         // const lga_name = relationData.lga_name;
         // const {score, GP_num, education_rank, population_num,averg_income, averg_age, homeless_rate} = relationData.factor;
         var myChart = echarts.init(document.getElementById(type));
@@ -32,7 +71,7 @@ export default class Charts extends Component{
                 }
             },
             legend: {
-                data: ['Emotion', 'GP', 'Education', 'Population', 'Income', 'Age', "Homeless"]
+                data: ['Emotion Score','Tweet Number', type]
             },
             grid: {
                 left: '3%',
@@ -43,7 +82,7 @@ export default class Charts extends Component{
             xAxis: [
                 {
                     type: 'category',
-                    data: ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
+                    data: cityList
                 }
             ],
             yAxis: [
@@ -53,74 +92,28 @@ export default class Charts extends Component{
             ],
             series: [
                 {
-                    name: 'Emotion',
+                    name: 'Emotion Score',
                     type: 'bar',
                     emphasis: {
                         focus: 'series'
                     },
-                    data: [320, 332, 301, 334, 390, 330, 320]
+                    data: [320, 332, 301]
                 },
                 {
-                    name: 'GP',
+                    name: 'Tweet Number',
                     type: 'bar',
-                    // stack: '广告',
                     emphasis: {
                         focus: 'series'
                     },
-                    data: [120, 132, 101, 134, 90, 230, 210]
+                    data: [120, 132, 101]
                 },
                 {
-                    name: 'Education',
+                    name: type,
                     type: 'bar',
-                    // stack: '广告',
                     emphasis: {
                         focus: 'series'
                     },
-                    data: [220, 182, 191, 234, 290, 330, 310]
-                },
-                {
-                    name: 'Population',
-                    type: 'bar',
-                    // stack: '广告',
-                    emphasis: {
-                        focus: 'series'
-                    },
-                    data: [150, 232, 201, 154, 190, 330, 410]
-                },
-                {
-                    name: 'Income',
-                    type: 'bar',
-                    data: [862, 1018, 964, 1026, 1679, 1600, 1570],
-                    emphasis: {
-                        focus: 'series'
-                    },
-                    // markLine: {
-                    //     lineStyle: {
-                    //         type: 'dashed'
-                    //     },
-                    //     data: [
-                    //         [{type: 'min'}, {type: 'max'}]
-                    //     ]
-                    // }
-                },
-                {
-                    name: 'Age',
-                    type: 'bar',
-                    barWidth: 5,
-                    // stack: '搜索引擎',
-                    emphasis: {
-                        focus: 'series'
-                    },
-                    data: [620, 732, 701, 734, 1090, 1130, 1120]
-                },
-                {
-                    name: 'Homeless',
-                    type: 'bar',
-                    // stack: '搜索引擎',
-                    emphasis: {
-                        focus: 'series'
-                    },
-                    data: [120, 132, 101, 134, 290, 230, 220]
+                    data: [220, 182, 191]
                 }
             ]
         };
@@ -128,79 +121,24 @@ export default class Charts extends Component{
         myChart.setOption(option);
       }
 
-    initAreaEchats = () =>{
+    initEmotionEchats = () =>{
         var chartDom = document.getElementById('area_chart');
         var myChart = echarts.init(chartDom);
         var option;
 
-        var data = [{
-            name: 'Grandpa',
-            children: [{
-                name: 'Uncle Leo',
-                value: 15,
-                children: [{
-                    name: 'Cousin Jack',
-                    value: 2
-                }, {
-                    name: 'Cousin Mary',
-                    value: 5,
-                    children: [{
-                        name: 'Jackson',
-                        value: 2
-                    }]
-                }, {
-                    name: 'Cousin Ben',
-                    value: 4
-                }]
-            }, {
-                name: 'Aunt Jane',
-                children: [{
-                    name: 'Cousin Kate',
-                    value: 4
-                }]
-            }, {
-                name: 'Father',
-                value: 10,
-                children: [{
-                    name: 'Me',
-                    value: 5,
-                    itemStyle: {
-                        color: 'red'
-                    }
-                }, {
-                    name: 'Brother Peter',
-                    value: 1
-                }]
-            }]
-        }, {
-            name: 'Mike',
-            children: [{
-                name: 'Uncle Dan',
-                children: [{
-                    name: 'Cousin Lucy',
-                    value: 3
-                }, {
-                    name: 'Cousin Luck',
-                    value: 4,
-                    children: [{
-                        name: 'Nephew',
-                        value: 2
-                    }]
-                }]
-            }]
-        }, {
-            name: 'Nancy',
-            children: [{
-                name: 'Uncle Nike',
-                children: [{
-                    name: 'Cousin Betty',
-                    value: 1
-                }, {
-                    name: 'Cousin Jenny',
-                    value: 2
-                }]
-            }]
-        }];
+        var data = [{"name": "melb", "children": [{"name": "Banyule", "value": 10, "children": [{"name": "positive", "value": 3,
+        "children": [{"name": "subjective", "value":2}, {"name": "objective", "value": 5}]}, {"name": "neutral", "value": 20,
+        "children": [{"name": "subjective", "value": 5}, {"name": "objective", "value": 6}]}, {"name": "negative", "value": 0,
+        "children": [{"name": "subjective", "value": 0}, {"name": "objective", "value": 0}]}]}, {"name": "Frankston", "value":
+        20, "children": [{"name": "positive", "value": 0, "children": [{"name": "subjective", "value": 0}, {"name": "objective",
+        "value": 0}]}, {"name": "neutral", "value": 0, "children": [{"name": "subjective", "value": 0}, {"name": "objective",
+        "value": 0}]}, {"name": "negative", "value": 0, "children": [{"name": "subjective", "value": 0}, {"name": "objective",
+        "value": 0}]}]}, {"name": "Greater Dandenong", "value": 0, "children": [{"name": "positive", "value": 0, "children":
+        [{"name": "subjective", "value": 0}, {"name": "objective", "value": 0}]}, {"name": "neutral", "value": 0, "children":
+        [{"name": "subjective", "value": 0}, {"name": "objective", "value": 0}]}, {"name": "negative", "value": 0, "children":
+        [{"name": "subjective", "value": 0}, {"name": "objective", "value": 0}]}]}]}]
+
+        // var data = this.state.emotionData;
 
         option = {
             visualMap: {
@@ -230,45 +168,45 @@ export default class Charts extends Component{
             <div>
             <Row>
             <Col span={12}>
-              <div style={{maxHeight:'500px',width:'100%'}}>
-                <div id="gp_chart" style={{width:'650px',height:'350px'}}></div>
-              </div>
+                <Card size="small" title="GP Number" >
+                    <div id="gp_chart" style={{width:'550px',height:'350px'}}></div>
+                </Card>
             </Col>
             <Col span={12}>
-              <div style={{maxHeight:'500px',width:'100%'}}>
-                <div id="education_chart" style={{width:'650px',height:'350px'}}></div>
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={12}>
-              <div style={{maxHeight:'500px',width:'100%'}}>
-                <div id="population_chart" style={{width:'650px',height:'350px'}}></div>
-              </div>
-            </Col>
-            <Col span={12}>
-              <div style={{maxHeight:'500px',width:'100%'}}>
-                <div id="income_chart" style={{width:'650px',height:'350px'}}></div>
-              </div>
+                <Card size="small" title="Education" >
+                    <div id="education_chart" style={{width:'550px',height:'350px'}}></div>
+                </Card>
             </Col>
           </Row>
           <Row>
             <Col span={12}>
-              <div style={{maxHeight:'500px',width:'100%'}}>
-                <div id="age_chart" style={{width:'650px',height:'350px'}}></div>
-              </div>
+            <Card size="small" title="Population" >
+                <div id="population_chart" style={{width:'550px',height:'350px'}}></div>
+             </Card>
             </Col>
             <Col span={12}>
-              <div style={{maxHeight:'500px',width:'100%'}}>
-                <div id="homeless_chart" style={{width:'650px',height:'350px'}}></div>
-              </div>
+            <Card size="small" title="Income" >
+                <div id="income_chart" style={{width:'550px',height:'350px'}}></div>
+              </Card>
             </Col>
           </Row>
           <Row>
             <Col span={12}>
-              <div style={{maxHeight:'500px',width:'100%'}}>
-                <div id="area_chart" style={{width:'650px',height:'350px'}}></div>
-              </div>
+            <Card size="small" title="Age" >
+                <div id="age_chart" style={{width:'550px',height:'350px'}}></div>
+             </Card>
+            </Col>
+            <Col span={12}>
+            <Card size="small" title="Homeless Rate" >
+                <div id="homeless_chart" style={{width:'550px',height:'350px'}}></div>
+             </Card>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={12}>
+            <Card size="small" title="Emotion Component" >
+                <div id="area_chart" style={{width:'550px',height:'350px'}}></div>
+              </Card>
             </Col>
           </Row>
           </div>

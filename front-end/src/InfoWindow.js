@@ -1,10 +1,9 @@
 import React from 'react';
 import { Divider } from 'antd';
-import * as echarts from 'echarts';
 
 
 function InfoWindow(props){
-    let {name,GP_num,Education,covid_attention,key_words,level_advanced,population} = props.params
+    let {name,GP_num,Education,covid_attention,level_advanced,population} = props.params
     const content = (
         <div style={{maxHeight:'1000px', weight:'250px', minWidth:'250px', textAlign:'center'}}>
             <h1 style={{color:'#0e4381'}}>{name}</h1>
