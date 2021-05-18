@@ -2,11 +2,17 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-// import Home from './Home'
+import Home from './Home'
 import reportWebVitals from './reportWebVitals';
-
+import {
+  BrowserRouter as Router,
+  Route,
+} from "react-router-dom";
 ReactDOM.render(
-    <App />,
+  <Router>
+    <Route exact path='/' component={Home}></Route>
+    <Route path='/app' component={App} ></Route>
+  </Router>,
   document.getElementById('root')
 );
 

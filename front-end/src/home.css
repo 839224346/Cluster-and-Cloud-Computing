@@ -1,0 +1,52 @@
+#banner {
+    padding: 0;
+    background-image: -moz-linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("./images/unimelb.jpg");
+    background-image: -webkit-linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("./images/unimelb.jpg");
+    background-image: -ms-linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("./images/unimelb.jpg");
+    background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("./images/unimelb.jpg");
+    background-attachment: fixed;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    text-align: center;
+  }
+
+
+#banner {
+    display: -moz-flex;
+    display: -webkit-flex;
+    display: -ms-flex;
+    /* display: flex; */
+    -moz-flex-direction: column;
+    -webkit-flex-direction: column;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    -moz-justify-content: center;
+    -webkit-justify-content: center;
+    -ms-justify-content: center;
+    /* justify-content: center; */
+    cursor: default;
+    height: 100vh;
+    min-height: 35em;
+    overflow: hidden;
+    position: relative;
+    text-align: center;
+  }
+
+  #banner p {
+    text-transform: uppercase;
+    color: #fff;
+    font-size: xx-large;
+    font-weight: bolder;
+    letter-spacing: 1px;
+  }
+
+  #banner div.logo {
+    background: url('./images/logo.svg') center;
+    background-size: contain;
+    background-repeat: no-repeat;
+    min-width: 5em;
+    height: 10em;
+    margin: 10em auto 2em;
+    border-radius: 1em;
+  }

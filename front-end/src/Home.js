@@ -1,5 +1,13 @@
 /* eslint-disable no-useless-constructor */
 import {Component} from 'react'
+import './home.css';
+import { Card } from 'antd';
+import {
+    HashRouter  as Router,
+    Switch,
+    Route,
+    Link
+  } from "react-router-dom";
 
 export default class Home extends Component{
 
@@ -9,34 +17,18 @@ export default class Home extends Component{
     render(){
         return(
             <div>
-                123
-            {/* <template>
-            <div id="home" v-if="this.$route.path == '/'">
                 <section id="banner">
-                <div class="inner">
-                    <div class="logo"></div>
+                  <div className="inner">
+                    <div className="logo"></div>
                     <p>
                     COMP90024 - Cluster and Cloud Computing <br />
-                    Assignment Two
+                    Assignment Two <br />
                     </p>
-                </div>
-                <a href="#intro" class="more">Learn More</a>    
-                </section>
-                <section id="intro" class="wrapper center">
-                <div class="inner">
-                    <h2>Group Member</h2>
-                    <p>Hanxun Huang - 975781</p>
-                    <p>Haonan Chen - 930614</p>
-                    <p>Lihuan Zhang - 945003</p>
-                    <p>Xu Wang - 979895</p>
-                    <p>Yang Xu- 961717</p>
-                    <p class="button premium" onclick="window.location.href='/map'">
-                    <a id='premium'>Go Premium</a>
+                    <p>
+                        <Link to="/app">Explore More</Link>
                     </p>
                 </div>
                 </section>
-            </div>
-            </template> */}
             </div>
         )
     }
