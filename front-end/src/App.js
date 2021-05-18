@@ -142,6 +142,7 @@ export default class Map extends Component{
     // mouse click event: show grid info
     map.data.addListener('click', (event) => {
       let key_words = event.feature.getProperty('key_words')
+      let emotion_component = event.feature.getProperty('emotion_component')
       let params = {}
       params.name = event.feature.getProperty('name')
       params.GP_num = event.feature.getProperty('GP_num')
@@ -150,59 +151,14 @@ export default class Map extends Component{
       params.level_advanced = event.feature.getProperty('level_advanced')
       params.population = event.feature.getProperty('population')
 
-
-      // let statistics = event.feature.getProperty("statistcs")
-
-      // let infoPieDataSentiment = [] 
-      // let infoPieNameSentiment = []
-      // let infoPieData = []
-      // let infoPieName = []
-      // let temp = 'sentiment'
-
-      // for (const [key, value] of Object.entries(statistics.sentiment)) {
-      //   infoPieNameSentiment.push(key)
-      //   infoPieDataSentiment.push(value)
-      // }
-
-      // for (const [key, value] of Object.entries(statistics)) {
-      //   if (key != temp){
-      //     for(const [inner_key, inner_value] of Object.entries(value)) {
-      //       infoPieName.push(inner_key)
-      //       infoPieData.push(inner_value)
-      //     }
-      //   }
-      // }
-
-      // // set all chart data here
-      // let pieDatacollection_sentiment = {
-      //   labels: infoPieNameSentiment,
-      //   datasets: [
-      //     {
-      //       label: 'Sentiment',
-      //       backgroundColor: this.gradient('#F5F5F5','ff9900',infoPieDataSentiment.length) ,
-      //       data: infoPieDataSentiment
-      //     }
-      //   ]
-      // }
-
-      // let pieDatacollection = {
-      //   labels: infoPieName,
-      //   datasets: [
-      //     {
-      //       label: 'Sin',
-      //       backgroundColor: this.gradient('#F5F5F5','ff9900',infoPieData.length) ,
-      //       data: infoPieData
-      //     }
-      //   ]
-      // }
-
       infowindow.setContent(ReactDOMServer.renderToString(<InfoWindow params={params}/>))
       //infowindow.setPosition(event.feature.getGeometry().getAt(0).getAt(0).getAt(0))
       infowindow.setPosition(event.latLng)
       //infowindow.setOptions({pixelOffset: new google.maps.Size(0,0)})
       infowindow.open(map)
 
-      this.initArea(key_words)
+      this.initArea(emotion_component)
+      this.initCloudChart(key_words)
     })
     
     // mouse over event: highlight color
@@ -217,18 +173,106 @@ export default class Map extends Component{
     })
   }
 
-  initArea = (key_words) => {
-    var chartDom = document.getElementById('infoChart');
-    var myChart = echarts.init(chartDom);
-    var option;
-    let chatData = [];
+  initCloudChart = (key_words) => {
+    let CloudData = [];
     key_words.forEach((item)=>{
       let obj = {};
       obj.name = item.text;
       obj.value = item.value;
+      CloudData.push(obj)
+    })
+
+    var myChart = echarts.init(document.getElementById('cloudChart'));
+        let option = {
+            series: [{
+                type: 'wordCloud',
+        
+                // The shape of the "cloud" to draw. Can be any polar equation represented as a
+                // callback function, or a keyword present. Available presents are circle (default),
+                // cardioid (apple or heart shape curve, the most known polar equation), diamond (
+                // alias of square), triangle-forward, triangle, (alias of triangle-upright, pentagon, and star.
+        
+                shape: 'circle',
+        
+                // A silhouette image which the white area will be excluded from drawing texts.
+                // The shape option will continue to apply as the shape of the cloud to grow.
+        
+                // maskImage: maskImage,
+        
+                // Folllowing left/top/width/height/right/bottom are used for positioning the word cloud
+                // Default to be put in the center and has 75% x 80% size.
+        
+                left: 'center',
+                top: 'center',
+                width: '70%',
+                height: '80%',
+                right: null,
+                bottom: null,
+        
+                // Text size range which the value in data will be mapped to.
+                // Default to have minimum 12px and maximum 60px size.
+        
+                sizeRange: [12, 60],
+        
+                // Text rotation range and step in degree. Text will be rotated randomly in range [-90, 90] by rotationStep 45
+        
+                rotationRange: [-90, 90],
+                rotationStep: 45,
+        
+                // size of the grid in pixels for marking the availability of the canvas
+                // the larger the grid size, the bigger the gap between words.
+        
+                gridSize: 8,
+        
+                // set to true to allow word being draw partly outside of the canvas.
+                // Allow word bigger than the size of the canvas to be drawn
+                drawOutOfBound: false,
+        
+                // If perform layout animation.
+                // NOTE disable it will lead to UI blocking when there is lots of words.
+                layoutAnimation: true,
+        
+                // Global text style
+                textStyle: {
+                    fontFamily: 'sans-serif',
+                    fontWeight: 'bold',
+                    // Color can be a callback function or a color string
+                    color: function () {
+                        // Random color
+                        return 'rgb(' + [
+                            Math.round(Math.random() * 160),
+                            Math.round(Math.random() * 160),
+                            Math.round(Math.random() * 160)
+                        ].join(',') + ')';
+                    }
+                },
+                emphasis: {
+                    focus: 'self',
+        
+                    textStyle: {
+                        shadowBlur: 10,
+                        shadowColor: '#333'
+                    }
+                },
+        
+                // Data is an array. Each array item must have name and value property.
+                data: CloudData
+            }]
+        }
+        myChart.setOption(option)
+  }
+
+  initArea = (emotions) => {
+    var chartDom = document.getElementById('infoChart');
+    var myChart = echarts.init(chartDom);
+    var option;
+    let chatData = [];
+    Object.keys(emotions).forEach((key)=>{
+      let obj = {};
+      obj.name = key;
+      obj.value = emotions[key];
       chatData.push(obj)
     })
-    console.log(chatData)
 
     option = {
         tooltip: {
