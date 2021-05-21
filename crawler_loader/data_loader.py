@@ -1,6 +1,7 @@
 from datetime import datetime
 import json
 import couchdb
+import os
 
 couch = couchdb.Server('http://admin:admin@127.0.0.1:5984/')
 try:
@@ -8,7 +9,12 @@ try:
 except:
     db = couch['ccc']
     
-with open('processed-9M.txt', 'r') as f:
+txt_files = [f for f in os.listdir('.') if f.endswith('.txt')]
+if len(txt_files) != 1:
+    raise ValueError('should be only one txt file in the current directory')
+
+filename = txt_files[0]
+with open(filename, 'r') as f:
     count = 0
     tweet_list = []
     for line in f:

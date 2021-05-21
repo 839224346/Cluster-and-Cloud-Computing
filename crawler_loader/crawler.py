@@ -9,6 +9,7 @@ import yake
 from datetime import datetime
 import time
 import traceback
+import os
 
 couch = couchdb.Server('http://admin:admin@127.0.0.1:5984/')
 try:
@@ -17,7 +18,10 @@ except:
     db = couch['ccc']
 
 # load map
-melb_map = pickle.load(open('vic_map.p','rb'))
+dirname = os.path.dirname(__file__)
+filename = os.path.join(dirname, 'vic_map.p')
+
+melb_map = pickle.load(open(filename,'rb'))
 for k,v in melb_map.items():
     melb_map[k] = shape(v)
 
