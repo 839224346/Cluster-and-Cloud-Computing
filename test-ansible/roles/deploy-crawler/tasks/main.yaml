@@ -1,0 +1,8 @@
+---
+- name: Create the cronjob to run the script
+  become: yes
+  cron:
+    name: "Run tweepy python script every 15 minutes"
+    minute: "*/15"
+    job: "/usr/bin/python3 {{remote_working_directory}}/crawler_loader/crawler.py"
+    

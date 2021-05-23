@@ -1,0 +1,29 @@
+---
+- name: download data for database from mega
+  command: megadl {{mega_file_url_1}}
+  args:
+    chdir: '{{remote_working_directory}}/crawler_loader'
+  when: ansible_host == groups['instance1'][0] 
+
+- name: download data for database from mega
+  command: megadl {{mega_file_url_2}}
+  args:
+    chdir: '{{remote_working_directory}}/crawler_loader'
+  when: ansible_host == groups['instance2'][0] 
+
+- name: download data for database from mega
+  command: megadl {{mega_file_url_3}}
+  args:
+    chdir: '{{remote_working_directory}}/crawler_loader'
+  when: ansible_host == groups['instance3'][0] 
+
+- name: unzip downloaded data
+  command: unzip \*.zip
+  args:
+    chdir: '{{remote_working_directory}}/crawler_loader'
+
+- name: execute loader.py
+  become: yes
+  command: python3 data_loader.py
+  args:
+    chdir: '{{remote_working_directory}}/crawler_loader'

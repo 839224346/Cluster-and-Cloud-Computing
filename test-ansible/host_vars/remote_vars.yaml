@@ -1,0 +1,49 @@
+---
+#############################################
+#                  Common                   #
+#############################################
+project_working_directory: /home/connor
+proxy_address: http://wwwproxy.unimelb.edu.au:8000
+remote_working_directory: /home/ubuntu/COMP90024
+ansible_user: ubuntu
+git_repo_name: Cluster-and-Cloud-Computing
+git_repo_url: 'https://github.com/839224346/Cluster-and-Cloud-Computing.git'
+
+#############################################
+#                 CouchDB                   #
+#############################################
+couchdb_version: 3.1.1
+couchdb_image: ibmcom/couchdb3:latest
+couchdb_config_path: /home/ubuntu/couchdb/etc
+couchdb_share: 4
+couchdb_replica: 3
+couchdb_user: admin
+couchdb_pass: admin
+couchdb_uuid: '9938f2e6570b7defdb1b36b29705ac11'
+couchdb_port: 5984
+couchdb_container_name: 'couchdb_'
+couchdb_cookie: 'test'
+cluster_cookie: 'test'
+cluster_name: '_cluster_setup'
+
+cluster_communication_port_min: 9100
+cluster_communication_port_max: 9102
+
+#############################################
+#                  Docker                   #
+#############################################
+enable_docker_remote_control: true
+
+#############################################
+#                 Backend                   #
+#############################################
+
+#############################################
+#                 crawler                   #
+#############################################
+
+mega_file_url_1: 'https://mega.nz/#!2TpHmIQZ!K8AylWm96OxMXeYJC1IKNEMQ6Cn3zhTNrTWHXUE5y54'
+mega_file_url_2: 'https://mega.nz/#!6DxBiIaL!g6kKZl0yI5ChLnPHIGd63jDgV8CBOlSVXzklHQM6yt0'
+mega_file_url_3: 'https://mega.nz/#!aegBBCwS!x8wNG9v2aNPfr7Y4UDDoAPdTr0dlg2KCjZxBoDHez-U'
+mega_file_name: processed-9M.zip
+

@@ -1,0 +1,47 @@
+---
+- name: pull docker image for nginx 
+  become: yes
+  command: docker pull nginx:alpine
+  
+
+
+- name: run docker image 
+  become: yes
+  command: docker run -it -d --name g-nginx nginx:alpine
+
+
+- name: configure nginx conf
+  become: yes
+  shell: |
+    mkdir -p /root/nginx/conf
+    mkdir -p /root/nginx/html
+    mkdir -p /root/nginx/logs
+    docker cp g-nginx:/usr/share/nginx/html/index.html /root/nginx/html
+
+#     docker cp g-nginx:/etc/nginx/nginx.conf /root/nginx
+#     docker cp g-nginx:/etc/nginx/conf.d/default.conf /root/nginx/conf
+
+- name: stop and remove the docker container
+  become: yes
+  shell: |
+    docker stop g-nginx
+    docker rm g-nginx
+
+- name: upload new nginx conf to the server
+  become: yes
+  copy:
+    src: ./nginx.conf
+    dest: /root/nginx/
+    mode: 0777
+
+- name: upload new nginx conf to the server
+  become: yes
+  copy:
+    src: ./test.conf
+    dest: /root/nginx/conf/
+    mode: 0777
+
+- name: restart the nginx docker container
+  become: yes
+  shell: docker run --rm -d --name g-nginx --network host -v /root/nginx/nginx.conf:/etc/nginx/nginx.conf -v /root/nginx/logs:/var/log/nginx -v /root/nginx/html:/usr/share/nginx/html -v /root/nginx/conf:/etc/nginx/conf.d --privileged=true nginx:alpine
+

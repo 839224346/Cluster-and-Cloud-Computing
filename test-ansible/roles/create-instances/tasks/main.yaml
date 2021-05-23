@@ -1,0 +1,135 @@
+---
+- debug:
+    msg: "{{ item.volume_ids }}"
+  loop: '{{ instances }}'
+
+- name: Create instances
+  os_server:
+    name: '{{ item.name }}'
+    image: '{{ instance_image }}'
+    key_name: '{{ instance_key_name }}'
+    flavor: '{{ instance_flavor_backup }}'
+    availability_zone: '{{ availability_zone }}'
+    security_groups: '{{ item.security_groups }}'
+    network: '{{ instance_network }}'
+    volumes: "{{ item.volume_ids }}"
+    auto_floating_ip: yes
+    wait: yes
+    timeout: 600
+    state: present
+  register: os_instance
+  loop: '{{ instances }}'
+  when: item.name == "instance4"
+
+- name: set ip address to fact
+  set_fact:
+    ip_addresses: "{{ ip_addresses|default([]) + [ {'name': item.item.name, 'ip': item.openstack.public_v4} ] }}"
+  when: item.openstack is defined
+  loop: '{{ os_instance.results }}'
+
+- name: Create instances
+  os_server:
+    name: '{{ item.name }}'
+    image: '{{ instance_image }}'
+    key_name: '{{ instance_key_name }}'
+    flavor: '{{ instance_flavor }}'
+    availability_zone: '{{ availability_zone }}'
+    security_groups: '{{ item.security_groups }}'
+    network: '{{ instance_network }}'
+    volumes: "{{ item.volume_ids }}"
+    auto_floating_ip: yes
+    wait: yes
+    timeout: 600
+    state: present
+  register: os_instance
+  loop: '{{ instances }}'
+  when: item.name == "instance2"
+
+- name: set ip address to fact
+  set_fact:
+    ip_addresses: "{{ ip_addresses|default([]) + [ {'name': item.item.name, 'ip': item.openstack.public_v4} ] }}"
+  when: item.openstack is defined
+  loop: '{{ os_instance.results }}'
+  
+- name: Create instances
+  os_server:
+    name: '{{ item.name }}'
+    image: '{{ instance_image }}'
+    key_name: '{{ instance_key_name }}'
+    flavor: '{{ instance_flavor }}'
+    availability_zone: '{{ availability_zone }}'
+    security_groups: '{{ item.security_groups }}'
+    network: '{{ instance_network }}'
+    volumes: "{{ item.volume_ids }}"
+    auto_floating_ip: yes
+    wait: yes
+    timeout: 600
+    state: present
+  register: os_instance
+  loop: '{{ instances }}'
+  when: item.name == "instance3"
+
+- name: set ip address to fact
+  set_fact:
+    ip_addresses: "{{ ip_addresses|default([]) + [ {'name': item.item.name, 'ip': item.openstack.public_v4} ] }}"
+  when: item.openstack is defined
+  loop: '{{ os_instance.results }}'
+
+- name: Create instances
+  os_server:
+    name: '{{ item.name }}'
+    image: '{{ instance_image }}'
+    key_name: '{{ instance_key_name }}'
+    flavor: '{{ instance_flavor }}'
+    availability_zone: '{{ availability_zone }}'
+    security_groups: '{{ item.security_groups }}'
+    network: '{{ instance_network }}'
+    volumes: "{{ item.volume_ids }}"
+    auto_floating_ip: yes
+    wait: yes
+    timeout: 600
+    state: present
+  register: os_instance
+  loop: '{{ instances }}'
+  when: item.name == "instance1"
+
+- name: set ip address to fact
+  set_fact:
+    ip_addresses: "{{ ip_addresses|default([]) + [ {'name': item.item.name, 'ip': item.openstack.public_v4} ] }}"
+  when: item.openstack is defined
+  loop: '{{ os_instance.results }}'
+
+- debug:
+    msg: "| ip_addresses ==> {{ ip_addresses }}"
+
+- name: Create inventory file
+  copy:
+    content: "[all:vars]\nansible_user=ubuntu\nansible_ssh_private_key_file=/home/connor/test-ansible/Nectar.pem\n\n[dbServers:children]\ndbMaster\ndbSlave\n\n[dbMaster:children]\ninstance1\n\n[dbSlave:children]\ninstance2\ninstance3\n\n"
+    dest: "{{project_working_directory}}/test-ansible/inventory/hosts.ini"
+
+- name: set ip addresses to inventory file
+  lineinfile:
+    line: "[{{ item.name }}]\n{{ item.ip }}\n"
+    dest: "{{project_working_directory}}/test-ansible/inventory/hosts.ini"
+  loop: '{{ ip_addresses }}'
+
+- name: set ip addresses for couchdb cluster to inventory file
+  lineinfile:
+    line: "[database:children]\nmasternode\nworkers\n\n[masternode]\n{{ item.ip }}\n\n[workers]"
+    dest: "{{project_working_directory}}/test-ansible/inventory/hosts.ini"
+  loop: '{{ ip_addresses }}'
+  when: item.name == "instance1"
+
+- name: set ip addresses for couchdb cluster to inventory file
+  lineinfile:
+    line: "{{ item.ip }}"
+    dest: "{{project_working_directory}}/test-ansible/inventory/hosts.ini"
+  loop: '{{ ip_addresses }}'
+  when: item.name == "instance2"
+
+- name: set ip addresses for couchdb cluster to inventory file
+  lineinfile:
+    line: "{{ item.ip }}"
+    dest: "{{project_working_directory}}/test-ansible/inventory/hosts.ini"
+  loop: '{{ ip_addresses }}'
+  when: item.name == "instance3"

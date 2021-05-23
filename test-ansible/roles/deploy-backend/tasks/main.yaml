@@ -1,0 +1,10 @@
+---
+- name: build docker image for flask app 
+  command: docker build -t flaskapp:latest .
+  args:
+    chdir: '{{remote_working_directory}}/backend'
+
+- name: run docker image 
+  command: docker run -it -d --name flaskapp --net host -p 6100:6100 flaskapp:latest
+
+

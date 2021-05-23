@@ -1,0 +1,92 @@
+# ---
+- name: add proxy to enviroments
+  become: yes
+  lineinfile:
+    line: "http_proxy=\"{{ proxy_address }}\"\nhttps_proxy=\"{{ proxy_address }}\"\nftp_proxy=\"{{ proxy_address }}\"\nno_proxy=\"localhost,127.0.0.1,127.0.1.1,0.0.0.0,ubuntu,instance1\"\n"
+    dest: /etc/environment
+
+- name: make proxy available for current session
+  become: yes
+  shell: echo 'add proxy configuration success'
+  environment:
+    http_proxy: "{{ proxy_address }}"
+    https_proxy: "{{ proxy_address }}"
+    ftp_proxy: "{{ proxy_address }}"
+    no_proxy: "localhost,127.0.0.1,127.0.1.1,0.0.0.0,ubuntu,instance1"
+
+- name: Update apt-get
+  become: yes
+  apt: 
+    upgrade: yes
+
+- name: Update and upgrade apt packages
+  become: true
+  apt:
+    upgrade: yes
+    update_cache: yes
+    cache_valid_time: 86400 #One day
+
+- name: Install python3
+  become: yes
+  apt:   
+    name: 'python3-pip'
+
+- name: install dependencies
+  become: yes
+  apt:
+    name: ['vim','unzip','git','apt-transport-https','ca-certificates','curl','python-setuptools','software-properties-common','nginx','megadl']
+    state: latest
+
+
+- name: Install openstack
+  become: yes
+  pip: 
+    name: ['openstacksdk']
+    state: latest
+
+- name: Install shapely
+  become: yes
+  pip: 
+    name: ['shapely']
+    state: latest
+
+- name: Install tweepy
+  become: yes
+  pip: 
+    name: ['tweepy']
+    state: latest
+
+- name: Install textblob
+  become: yes
+  pip: 
+    name: ['textblob']
+    state: latest
+
+- name: Install nltk
+  become: yes
+  pip: 
+    name: ['nltk']
+    state: latest
+
+- name: Install yake
+  become: yes
+  pip: 
+    name: ['yake']
+    state: latest
+
+- name: Install textblob
+  become: yes
+  pip: 
+    name: ['textblob']
+    state: latest
+
+- name: Install couchdb
+  become: yes
+  pip: 
+    name: ['couchdb']
+    state: latest
+
+- name: Install docker
+  become: yes
+  apt:   
+    name: docker.io

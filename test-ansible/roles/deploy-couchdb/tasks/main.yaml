@@ -1,0 +1,81 @@
+
+# upload the script and set the remote host to a subnode
+# slave node
+- name: upload the subnode script for the first slave node
+  become: yes
+  copy:
+    src: ./slavenode1.sh
+    dest: /home/ubuntu/
+    mode: 0777
+  when: ansible_host == groups['workers'][0]
+
+- name: upload the subnode script for the second slave node
+  become: yes
+  copy:
+    src: ./slavenode2.sh
+    dest: /home/ubuntu/
+    mode: 0777
+  when: ansible_host == groups['workers'][1]
+
+- name: execute the subnode script for the first slave node
+  become: yes
+  shell: /home/ubuntu/slavenode1.sh
+  args:
+    executable: /bin/bash
+  when: ansible_host == groups['workers'][0]
+
+- name: execute the subnode script for the second slave node
+  become: yes
+  shell: /home/ubuntu/slavenode2.sh
+  args:
+    executable: /bin/bash
+  when: ansible_host == groups['workers'][1]
+
+# master node
+
+# - name: export instances ip addresses for masternode
+#   become: yes
+#   script: declare -a nodes=({{groups['masternode'][0]}} {{groups['workers'][0]}} {{groups['workers'][1]}})
+#   args:
+#     executable: /bin/bash
+#   when: ansible_host == groups['masternode'][0]
+
+# - name: export instances ip addresses for masternode
+#   become: yes
+#   shell: export masternode={{ansible_default_ipv4.address}}
+#   args:
+#     executable: /bin/bash
+#   when: ansible_host == groups['masternode'][0]
+
+- name: upload the masternode script
+  become: yes
+  copy:
+    src: ./masternode.sh
+    dest: /home/ubuntu/
+    mode: 0777
+  when: ansible_host == groups['masternode'][0]
+  
+- name: upload the conf script
+  become: yes
+  copy:
+    src: ./couchdb_conf.sh
+    dest: /home/ubuntu/
+    mode: 0777
+  when: ansible_host == groups['masternode'][0]
+
+- name: execute the masternode script
+  become: yes
+  shell: /home/ubuntu/masternode.sh
+  args:
+    executable: /bin/bash
+  when: ansible_host == groups['masternode'][0]
+
+- name: execute the conf script
+  become: yes
+  script: couchdb_conf.sh
+  args:
+    executable: /bin/bash
+  when: ansible_host == groups['masternode'][0]
+
+
+  # -p 5984:5984 -p 5986:5986 -p 4369:4369 -p 9100:9100\

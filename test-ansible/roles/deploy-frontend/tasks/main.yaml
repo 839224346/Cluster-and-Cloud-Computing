@@ -1,0 +1,10 @@
+---
+- name: build docker image for react app 
+  command: docker build -t reactapp:latest .
+  become: yes
+  args:
+    chdir: '{{remote_working_directory}}/front-end'
+
+- name: run docker image 
+  become: yes
+  command: docker run -it -d --net host --name reactapp reactapp:latest 

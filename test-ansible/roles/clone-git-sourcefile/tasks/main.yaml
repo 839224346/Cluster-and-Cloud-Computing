@@ -1,0 +1,15 @@
+---
+
+- name: Creates directory
+  become: yes
+  file:
+    path: /COMP90024
+    state: directory
+    
+
+- name: clone source code from git
+  become: yes
+  git:
+    repo: 'https://github.com/839224346/Cluster-and-Cloud-Computing.git'
+    dest: '{{ remote_working_directory }}'
+# git clone public repo

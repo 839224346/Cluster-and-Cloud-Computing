@@ -1,0 +1,79 @@
+---
+#############################################
+#              Common vars                  #
+#############################################
+availability_zone: melbourne-qh2-uom
+instance_network: qh2-uom-internal
+instance_image: f8b79936-6616-4a22-b55d-0d0a1d27bceb
+instance_key_name: Nectar
+instance_flavor: uom.mse.2c9g
+instance_flavor_backup: uom.mse.1c4g
+project_working_directory: /home/connor
+
+#############################################
+#             Security group                #
+#############################################
+# Security group
+security_groups:
+  - name: instance1-security-group
+    description: "Security group for instance1 server"
+    protocol: tcp
+    port_range_min: 1
+    port_range_max: 65535
+    remote_ip_prefix: 0.0.0.0/0
+  - name: instance2-security-group
+    description: "Security group for instance1 server"
+    protocol: tcp
+    port_range_min: 1
+    port_range_max: 65535
+    remote_ip_prefix: 0.0.0.0/0  
+  - name: instance3-security-group
+    description: "Security group for instance1 server"
+    protocol: tcp
+    port_range_min: 1
+    port_range_max: 65535
+    remote_ip_prefix: 0.0.0.0/0  
+  - name: instance4-security-group
+    description: "Security group for instance1 server"
+    protocol: tcp
+    port_range_min: 1
+    port_range_max: 65535
+    remote_ip_prefix: 0.0.0.0/0
+
+
+#############################################
+#                Instance                   #
+#############################################
+instances:
+  - name: instance1
+    security_groups: instance1-security-group
+    volume_ids: '{{ instance1_volumes|default([]) }}'
+    volumes:
+      - vol_name: volume_db1
+        vol_size: 80
+        device: /dev/vdb
+        mountpoint: /data
+  - name: instance2
+    security_groups: instance2-security-group
+    volume_ids: '{{ instance2_volumes|default([]) }}'
+    volumes:
+      - vol_name: volume_db2
+        vol_size: 80
+        device: /dev/vdb
+        mountpoint: /data
+  - name: instance3
+    security_groups: instance3-security-group
+    volume_ids: '{{ instance3_volumes|default([]) }}'
+    volumes:
+      - vol_name: volume_db3
+        vol_size: 80
+        device: /dev/vdb
+        mountpoint: /data
+  - name: instance4
+    security_groups: instance4-security-group
+    volume_ids: '{{ instance4_volumes|default([]) }}'
+    volumes:
+      - vol_name: volume_ml
+        vol_size: 20
+        device: /dev/vdb
+        mountpoint: /data
