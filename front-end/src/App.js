@@ -339,7 +339,7 @@ export default class Map extends Component{
 
   search = () =>{
     // let url = "http://0.0.0.0:6100/api/statistics/zone/melbourn?begintime=1616194716000&&endtime=1620601116000"
-    let url = `http://172.26.132.20:6100/api/statistics/zone/melbourn?begintime=${this.state.startTime}&&endtime=${this.state.endTime}`;
+    let url = `/api/statistics/zone/melbourn?begintime=${this.state.startTime}&&endtime=${this.state.endTime}`;
     this.mapBuild(url)
   }
   show = () => {
