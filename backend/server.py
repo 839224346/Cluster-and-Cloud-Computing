@@ -31,7 +31,7 @@ def statistics():
     new_lga_name = ['Banyule', 'Bayside','Boroondara','Brimbank','Cardinia','Casey','Darebin','Frankston','Glen Eira','Greater Dandenong','Hobsons Bay','Hume','Knox','Macedon Ranges','Manningham','Maribyrnong','Maroondah','Melbourne','Melton','Mitchell','Monash','Moonee Valley','Moorabool','Moreland','Mornington Peninsula','Murrindindi','Nillumbik','Port Phillip','Stonnington','Whitehorse','Whittlesea','Wyndham','Yarra','Yarra Ranges']
 
     try:
-        couch = couchdb.Server('http://admin:admin@0.0.0.0:5984/')
+        couch = couchdb.Server('http://admin:admin@127.0.0.1:5984/')
         db = couch['ccc']
     except ConnectionRefusedError:
         err = {}
