@@ -2,7 +2,7 @@ import axios from "axios"
 
 const request = axios.create({
 //   baseURL: "http://167.172.11.217/",
-  baseURL: "http://172.26.132.20:6100/",
+  baseURL: "http://localhost:6100/",
   timeout: 10000,
   // headers: { "auth-token": accessTokenKey },
 })
