@@ -16,15 +16,15 @@ if len(txt_files) != 1:
 filename = txt_files[0]
 with open(filename, 'r') as f:
     count = 0
-    tweet_list = []
     for line in f:
         count += 1
-        tweet_list += json.loads(line),
-        if count % 10000 == 0: 
-            data = {}
-            data['rows'] = tweet_list
-            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S:%f")
-            db[timestamp] = data
-            tweet_list = []
+        tweet = json.loads(line)[0]
+        print(type(tweet))
+        if count % 100000 == 0: 
+            print(count//100000)
         
-
+        timestamp = int(datetime.strptime(tweet['created_at'], "%Y-%m-%d %H:%M:%S").timestamp())
+        timestamp = str(timestamp) +'.' + str(tweet['tweet_id'])
+        tweet['_id'] = timestamp
+        db.save(tweet)
+        if count ==1: break

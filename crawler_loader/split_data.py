@@ -13,3 +13,4 @@ with open('processed-9M.txt', 'r') as f:
         index = count % FILENUM
         files[index].write(json.dumps(_dict))
         files[index].write('\n')
+        
