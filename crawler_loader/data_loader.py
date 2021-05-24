@@ -19,12 +19,11 @@ with open(filename, 'r') as f:
     for line in f:
         count += 1
         tweet = json.loads(line)[0]
-        print(type(tweet))
-        if count % 100000 == 0: 
-            print(count//100000)
+        #if count % 100000 == 0: 
+            #print(count//100000)
         
         timestamp = int(datetime.strptime(tweet['created_at'], "%Y-%m-%d %H:%M:%S").timestamp())
-        timestamp = str(timestamp) +'.' + str(tweet['tweet_id'])
-        tweet['_id'] = timestamp
+        tweet['created_at']  = timestamp
+        tweet['_id'] = str(tweet['tweet_id'])
         db.save(tweet)
-        if count ==1: break
+        if count ==500000: break
