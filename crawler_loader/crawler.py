@@ -121,8 +121,13 @@ while True:
         break
 # print('new tweets: ', len(tweet_list))
 
+for tweet in tweet_list:
+    timestamp = int(datetime.strptime(tweet['created_at'], "%Y-%m-%d %H:%M:%S").timestamp())
+    tweet['created_at']  = timestamp
+    tweet['_id'] = str(tweet['tweet_id'])
+
 # save data
-data = {}
-data['rows'] = tweet_list
-timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-db[timestamp] = data
+try:
+    db.update(tweet_list)
+except:
+    print('Update error!')
