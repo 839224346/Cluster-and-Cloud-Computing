@@ -26,3 +26,5 @@ with open(filename, 'r') as f:
             timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S:%f")
             db[timestamp] = data
             tweet_list = []
+        
+
