@@ -14,17 +14,17 @@ knowledge	of	life	in	the	cities of	Australia.
 # CCC Group 34
 Team Members:
 Congran Li    - 1035899
-Haoyu Man     - 
+Haoyu Man     - 893862
 Peiyu Zhu     - 1126549
 Yi Wang       - 860072
 Yiyang Jin    - 966255
 
 
 ## Video links
-
+https://youtu.be/3_aXRwZOCpQ
 
 ### Frontend presentation
-
+https://youtu.be/3_aXRwZOCpQ
 
 ### PPT
 https://docs.google.com/presentation/d/1PV_Ui_XYZrv7qMABt_pXkZIt7Gh6DANiCvhuGUy27Ig/edit?usp=sharing
