@@ -319,8 +319,9 @@ def queryRelationship():
                 fin_emotion_score.append(emotion_num[each] + final_result[str(each)]['emotion_score'])
                 fin_tweet_num.append(covid_attention[each] + final_result[str(each)]['tweet_num'])
             except Exception as error:
-                fin_emotion_score.append(emotion_num[each])
-                fin_tweet_num.append(covid_attention[each])
+                
+                fin_emotion_score.append(final_result[str(each)]['emotion_score'])
+                fin_tweet_num.append(final_result[str(each)]['tweet_num'])
 
             fin_GP_num.append(api2["data"]["factor"]["GP_num"][index])
             fin_education_rank.append(api2["data"]["factor"]["education_rank"][index])
