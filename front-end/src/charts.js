@@ -222,7 +222,7 @@ export default class Charts extends Component{
                     emphasis: {
                         focus: 'series'
                     },
-                    data: this.state.relationData.factor.emotion_score * 100000
+                    data: this.state.relationData.factor.emotion_score.map(item => item * 100000)
                 },
                 {
                     name: 'Tweet Number',
