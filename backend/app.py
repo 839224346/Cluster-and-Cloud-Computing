@@ -315,8 +315,12 @@ def queryRelationship():
             index = lgaid_i_map[str(each)]
     
             fin_lga_name.append(api2["data"]["lga_name"][index])
-            fin_emotion_score.append(emotion_num[each] + final_result[str(each)]['emotion_score'])
-            fin_tweet_num.append(covid_attention[each] + final_result[str(each)]['tweet_num'])
+            if (final_result.get(str(each), '0') == '0'):
+                fin_emotion_score.append(emotion_num[each])
+                fin_tweet_num.append(covid_attention[each])
+            else:
+                fin_emotion_score.append(emotion_num[each] + final_result[str(each)]['emotion_score'])
+                fin_tweet_num.append(covid_attention[each] + final_result[str(each)]['tweet_num'])
             fin_GP_num.append(api2["data"]["factor"]["GP_num"][index])
             fin_education_rank.append(api2["data"]["factor"]["education_rank"][index])
             fin_population_num.append(api2["data"]["factor"]["population_num"][index])
