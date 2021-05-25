@@ -139,7 +139,7 @@ def get_scores_from_cached_data(starttime, endtime):
         final_result[str(lga_id)]['emotion_component']['neutral'] += new_item['emotion_component']['neutral']
         final_result[str(lga_id)]['emotion_component']['negative'] += new_item['emotion_component']['negative']
         final_result[str(lga_id)]['children']['value'] += new_item['children']['value']
-                final_result[str(lga_id)]['children']['children'][0]['value'] += new_item['children']['children'][0]['children'][0]['value'] + new_item['children']['children'][0]['children'][1]['value']
+        final_result[str(lga_id)]['children']['children'][0]['value'] += new_item['children']['children'][0]['children'][0]['value'] + new_item['children']['children'][0]['children'][1]['value']
         final_result[str(lga_id)]['children']['children'][1]['value'] += new_item['children']['children'][1]['children'][0]['value'] + new_item['children']['children'][1]['children'][1]['value']
         final_result[str(lga_id)]['children']['children'][2]['value'] += new_item['children']['children'][2]['children'][0]['value'] + new_item['children']['children'][2]['children'][1]['value']
         final_result[str(lga_id)]['children']['children'][0]['children'][0]['value'] += new_item['children']['children'][0]['children'][0]['value']
