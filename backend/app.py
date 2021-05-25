@@ -9,11 +9,11 @@ import conf
 import helper
 
 
-server = flask.Flask(__name__)
-CORS(server, resources=r'/*')
+app = flask.Flask(__name__)
+CORS(app, resources=r'/*')
 # CORS(server, supports_credentials=True)
 
-@server.route("/test", methods = ['GET'])
+@app.route("/test", methods = ['GET'])
 def hello_world():
     return "hello world"
 
@@ -216,7 +216,7 @@ def statistics():
 
 
 
-@server.route('/api/statistics/relationship',methods = ['post'])
+@app.route('/api/statistics/relationship',methods = ['post'])
 def queryRelationship():
 
     da=json.loads(request.data)
@@ -356,7 +356,7 @@ def processview(view):
     return result
 
 
-@server.route('/api/statistics/lgaEmotion',methods = ['post'])
+@app.route('/api/statistics/lgaEmotion',methods = ['post'])
 def querylgaEmotion():
 
     da=json.loads(request.data)
@@ -572,4 +572,5 @@ def internal_server_error(e):
     err["message"] = "An internal server error occurred."
     return json.dumps(err, ensure_ascii=False)
     
-server.run(port = 6100,host = '0.0.0.0',threaded = True)
+if __name == '__main__':
+    app.run(debug=True, host='0.0.0.0')
