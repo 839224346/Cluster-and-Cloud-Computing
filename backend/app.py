@@ -184,14 +184,13 @@ def statistics():
 # + final_result[str(api1["features"][i]["properties"]["lga_id"])]['tweet_num']
         for i in range(len(api1["features"])):
             
-            for key,value in final_result[str(new_lga_id[i])]['emotion_component'].items():
-                if key in emotion_component[lgaid_i_map[str(api1["features"][0]["properties"]["lga_id"])]]:
-                    emotion_component[lgaid_i_map[str(api1["features"][0]["properties"]["lga_id"])]][key] += value
-                else:
-                    emotion_component[lgaid_i_map[str(api1["features"][0]["properties"]["lga_id"])]][key] = value
+            emotion_component[i]["positive"] = emotion_component[i]["positive"] + final_result[str(new_lga_id[i])]['emotion_component']["positive"]
+            emotion_component[i]["neutral"] = emotion_component[i]["neutral"] + final_result[str(new_lga_id[i])]['emotion_component']["neutral"]
+            emotion_component[i]["negative"] = emotion_component[i]["negative"] + final_result[str(new_lga_id[i])]['emotion_component']["negative"]
             
-            emo_com_co = copy.deepcopy(emotion_component[lgaid_i_map[str(api1["features"][0]["properties"]["lga_id"])]])
 
+            emo_com_co = copy.deepcopy(emotion_component[i])
+            
             one_major_emo = ""
             value = emo_com_co['positive'] + emo_com_co['neutral'] + emo_com_co['negative']
             if value != 0:
@@ -206,9 +205,10 @@ def statistics():
 
             api1["features"][i]["properties"]["covid_attention"] = covid_attention[api1["features"][i]["properties"]["lga_id"]] + final_result[str(new_lga_id[i])]['tweet_num']
             api1["features"][i]["properties"]["major_emotion"] = one_major_emo
-            api1["features"][i]["properties"]["emotion_component"] = emotion_component[lgaid_i_map[str(api1["features"][0]["properties"]["lga_id"])]]
+            api1["features"][i]["properties"]["emotion_component"] = emotion_component[lgaid_i_map[str(api1["features"][i]["properties"]["lga_id"])]]
             # api1["features"][i]["properties"]["key_words"] = keyword_data[api1["features"][i]["properties"]["lga_id"]]
-            api1["features"][i]["properties"]["key_words"] = final_result[str(new_lga_id[i])]['keyword']
+            api1["features"][i]["properties"]["key_words"] = []
+            api1["features"][i]["properties"]["key_words"].append(final_result[str(new_lga_id[i])]['keyword'])
 
         return json.dumps(api1, ensure_ascii=False)
 
