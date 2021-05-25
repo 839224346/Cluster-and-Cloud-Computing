@@ -145,7 +145,7 @@ def get_scores_from_cached_data(starttime, endtime):
         final_result[str(lga_id)]['children']['children'][2]['children'][0]['value'] += new_item['children']['children'][2]['children'][0]['value']
         final_result[str(lga_id)]['children']['children'][2]['children'][1]['value'] += new_item['children']['children'][2]['children'][1]['value']
 
-    print(final_result)
+#     print(final_result)
     return final_result
 
 
