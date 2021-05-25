@@ -209,8 +209,8 @@ export default class Map extends Component{
     let CloudData = [];
     key_words.forEach((item)=>{
       let obj = {};
-      obj.name = item.text;
-      obj.value = item.value;
+      obj.name = item;
+      obj.value = Math.random(1,100);
       CloudData.push(obj)
     })
 
