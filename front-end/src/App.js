@@ -103,20 +103,55 @@ export default class Map extends Component{
         this.barData.push(total)
       }
       let color = '#000000'
-      if (total > 1)
-        color = colors[0]
-      if (total > 100)
-        color = colors[1]
-      if (total > 300)
-        color = colors[2]
-      if (total > 500)
-        color = colors[3]
-      if (total > 1000)
-        color = colors[4]
-      if (total > 1500)
-        color = colors[5]
-      if (total > 2000)
-        color = colors[6]  
+      if (this.state.searchFactor === "covid_attention"){
+        if (total > 0)
+          color = colors[0]
+        if (total > 10000)
+          color = colors[1]
+        if (total > 15000)
+          color = colors[2]
+        if (total > 20000)
+          color = colors[3]
+        if (total > 25000)
+          color = colors[4]
+        if (total > 30000)
+          color = colors[5]
+        if (total > 35000)
+          color = colors[6]  
+
+      }
+      if(this.state.searchFactor === "GP_num"){
+        if (total > 0)
+          color = colors[0]
+        if (total > 0.3)
+          color = colors[1]
+        if (total > 0.6)
+          color = colors[2]
+        if (total > 0.9)
+          color = colors[3]
+        if (total > 1.2)
+          color = colors[4]
+        if (total > 1.5)
+          color = colors[5]
+        if (total > 1.8)
+          color = colors[6]  
+      }
+      if(this.state.searchFactor === "Education"){
+        if (total > 0)
+          color = colors[6]
+        if (total > 5)
+          color = colors[5]
+        if (total > 10)
+          color = colors[4]
+        if (total > 15)
+          color = colors[3]
+        if (total > 20)
+          color = colors[2]
+        if (total > 25)
+          color = colors[1]
+        if (total > 30)
+          color = colors[0]  
+      }
 
       return {
         fillColor: color,
@@ -308,7 +343,7 @@ export default class Map extends Component{
   }
 
   getFactor = (value) =>{
-    console.log(value)
+    // console.log(value)
     this.setState({
       searchFactor: value
     })
@@ -372,7 +407,7 @@ export default class Map extends Component{
                 >
                   <Option value="covid_attention">Covid Attention</Option>
                   <Option value="GP_num">GP Number</Option>
-                  <Option value="level_advanced">Level Advanced</Option>
+                  {/* <Option value="level_advanced">Level Advanced</Option> */}
                   <Option value="Education">Education</Option>
                 </Select>
                 </Form.Item>
