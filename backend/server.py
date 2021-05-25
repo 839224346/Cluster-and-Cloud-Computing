@@ -34,7 +34,7 @@ def statistics():
     
     try:
         couch = couchdb.Server('http://admin:admin@127.0.0.1:5984/')
-        db = couch['ccc']
+        db = couch['final']
     except ConnectionRefusedError:
         err = {}
         err["name"] = "ConnectionRefusedError"
@@ -239,7 +239,7 @@ def queryRelationship():
 
     try:
         couch = couchdb.Server('http://admin:admin@127.0.0.1:5984/')
-        db = couch['ccc']
+        db = couch['final']
     except ConnectionRefusedError:
         err = {}
         err["name"] = "ConnectionRefusedError"
@@ -371,7 +371,7 @@ def querylgaEmotion():
 
     try:
         couch = couchdb.Server('http://admin:admin@127.0.0.1:5984/')
-        db = couch['ccc']
+        db = couch['final']
     except ConnectionRefusedError:
         err = {}
         err["name"] = "ConnectionRefusedError"
