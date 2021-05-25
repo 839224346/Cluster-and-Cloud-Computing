@@ -31,22 +31,6 @@
     executable: /bin/bash
   when: ansible_host == groups['workers'][1]
 
-# master node
-
-# - name: export instances ip addresses for masternode
-#   become: yes
-#   script: declare -a nodes=({{groups['masternode'][0]}} {{groups['workers'][0]}} {{groups['workers'][1]}})
-#   args:
-#     executable: /bin/bash
-#   when: ansible_host == groups['masternode'][0]
-
-# - name: export instances ip addresses for masternode
-#   become: yes
-#   shell: export masternode={{ansible_default_ipv4.address}}
-#   args:
-#     executable: /bin/bash
-#   when: ansible_host == groups['masternode'][0]
-
 - name: upload the masternode script
   become: yes
   copy:

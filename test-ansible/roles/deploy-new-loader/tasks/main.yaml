@@ -1,0 +1,18 @@
+
+- name: execute final-data-update.py
+  become: yes
+  command: python3 final-data-update.py
+  args:
+    chdir: '{{remote_working_directory}}/crawler_loader'
+  when: ansible_host == groups['workers'][1]
+
+- name: execute sample data saving
+  become: yes
+  command: python3 test-data-update.py
+  args:
+    chdir: '{{remote_working_directory}}/crawler_loader'
+  when: ansible_host == groups['workers'][0]
+
+- name: wait for cluster replication
+  become: yes
+  command: sleep 3

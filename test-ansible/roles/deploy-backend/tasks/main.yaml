@@ -4,7 +4,24 @@
   args:
     chdir: '{{remote_working_directory}}/backend'
 
+- name: sleep for three seconds
+  command: sleep 3
+
 - name: run docker image 
-  command: docker run -it -d --name flaskapp --net host -p 6100:6100 flaskapp:latest
+  command: docker run -it -d --name flaskapp --net host flaskapp
+  when: ansible_host == groups['workers'][0]
 
+- name: sleep for three seconds
+  command: sleep 3
 
+- name: run docker image 
+  command: docker run -it -d --name flaskapp --net host flaskapp
+  when: ansible_host == groups['workers'][1]
+
+- name: sleep for three seconds
+  command: sleep 3
+  
+
+- name: run docker image 
+  command: docker run -it -d --name flaskapp --net host flaskapp
+  when: ansible_host == groups['masternode'][0]

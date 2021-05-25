@@ -12,25 +12,19 @@ http {
     gzip  on;
     upstream backendserver {
 
-
-
-
-        server 172.26.133.10:6100;
-        server 172.26.131.108:6100;
-        server 172.26.129.163:6100;
+        server {{ groups['masternode'][0] }}:6100;
+        server {{ groups['workers'][0] }}:6100;
+        server {{ groups['workers'][1] }}:6100;
         #upstream backendserver input here
-
-
-
 
     }
     server {
         listen       80;
-        server_name  172.26.132.20;
+        server_name  {{ ansible_host }};
         location / {
             root   html;
 
-            proxy_pass   http://172.26.132.20:3000;
+            proxy_pass   http://{{ ansible_host }}:3000;
             # proxy_pass input here
 
             index  index.html index.htm;

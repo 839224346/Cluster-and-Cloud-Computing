@@ -6,10 +6,11 @@
 #     - host_vars/remote_vars.yaml
 #   gather_facts: true
 #   roles:
-#     # - role: deploy-couchdb
-#     # - role: clone-git-sourcefile
-#     - role: deploy-loader
-#     # - role: deploy-backend
+#     # - role: delete-containers
+#     - role: deploy-couchdb
+#     - role: clone-git-sourcefile
+#     - role: deploy-new-loader
+#     - role: deploy-backend
 
 # - hosts: instance2
 #   become: yes
@@ -25,9 +26,10 @@
     - host_vars/remote_vars.yaml
   gather_facts: true
   roles:
+    - role: delete-containers
     - role: clone-git-sourcefile
     - role: deploy-frontend
-    # - role: deploy-nginx
+    - role: deploy-nginx
 
 # - hosts: instance2
 #   become: yes

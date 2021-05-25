@@ -1,0 +1,20 @@
+- name: kill containers
+  shell: docker kill $(docker ps -q)
+  args:
+    executable: /bin/bash
+
+- name: remove containers
+  shell: docker rm $(docker ps -a -q)
+  args:
+    executable: /bin/bash
+
+- name: remove images
+  shell: docker rmi $(docker images -q)
+  args:
+    executable: /bin/bash
+
+
+- name: delete /comp90024 file
+  file:
+    state: absent
+    path: /home/ubuntu/COMP90024
