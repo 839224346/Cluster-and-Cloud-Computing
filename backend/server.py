@@ -5,14 +5,13 @@ import flask,json
 from flask import request
 from collections import Counter
 from flask_cors import CORS
+import conf
+import helper
+
 
 server = flask.Flask(__name__)
 CORS(server, resources=r'/*')
 # CORS(server, supports_credentials=True)
-
-@server.route("/test", methods = ['GET'])
-def hello_world():
-    return "hello world"
 
 @server.route('/api/statistics/zone/melbourn',methods=['get'])
 def statistics():  
@@ -27,9 +26,8 @@ def statistics():
     file1=open('api_1.json')
     api1=json.load(file1)
 
-    new_lga_id = [20660, 20910, 21110,21180,21450,21610,21890,22170,22310,22670,23110,23270,23670,24130,24210,24330,24410,24600,24650,24850,24970,25060,25150,25250,25340,25620,25710,25900,26350,26980,27070,27260,27350,27450]
-    new_lga_name = ['Banyule', 'Bayside','Boroondara','Brimbank','Cardinia','Casey','Darebin','Frankston','Glen Eira','Greater Dandenong','Hobsons Bay','Hume','Knox','Macedon Ranges','Manningham','Maribyrnong','Maroondah','Melbourne','Melton','Mitchell','Monash','Moonee Valley','Moorabool','Moreland','Mornington Peninsula','Murrindindi','Nillumbik','Port Phillip','Stonnington','Whitehorse','Whittlesea','Wyndham','Yarra','Yarra Ranges']
-
+    lgaid_i_map = conf.lgaid_i_map
+    
     try:
         couch = couchdb.Server('http://admin:admin@127.0.0.1:5984/')
         db = couch['ccc']
@@ -39,29 +37,41 @@ def statistics():
         err["message"] = "Database connection error."
         return json.dumps(err, ensure_ascii=False)
     else:
-        mytemp = db.get('_design/example')
+        new_lga_id = [20660, 20910, 21110,21180,21450,21610,21890,22170,22310,22670,23110,23270,23670,24130,24210,24330,24410,24600,24650,24850,24970,25060,25150,25250,25340,25620,25710,25900,26350,26980,27070,27260,27350,27450]
+    
+        mytemp = db.get('_design/example4')
         if mytemp is not None:
-            del db['_design/example']
-
+            del db['_design/example4']
+    
         viewData = {
-        "score":{
-            "map":"function(doc){ for (i = 0; i < doc.rows.length; i++){ if ( new Date(doc.rows[i].created_at).getTime() > "+ starttime +  " && new Date(doc.rows[i].created_at).getTime() <"+ endtime +") emit(doc.rows[i].lga_code, 1)};}",
+        "emotion_1":{
+            "map":"function(doc){ if (doc.created_at > "+ starttime +  " && doc.created_at <"+ endtime +" && doc.polarity == \"positive\" ) emit(doc.lga_code, 1);}",
             "reduce":"function (key, values) {  return sum(values); }"
-            },
-        "emotion":{
-            "map":"function(doc){ for (i = 0; i < doc.rows.length; i++){ if ( new Date(doc.rows[i].created_at).getTime() > "+ starttime +  " && new Date(doc.rows[i].created_at).getTime() <"+ endtime +") emit(doc.rows[i].lga_code, doc.rows[i].polarity)};}",
-            "reduce":"function (key, values) {  return values; }"
-            },
+        },
+        "emotion_2":{
+            "map":"function(doc){ if (doc.created_at > "+ starttime +  " && doc.created_at <"+ endtime +" && doc.polarity == \"neutral\" ) emit(doc.lga_code, 1);}",
+            "reduce":"function (key, values) {  return sum(values); }"
+        },
+        "emotion_3":{
+            "map":"function(doc){ if (doc.created_at > "+ starttime +  " && doc.created_at <"+ endtime +" && doc.polarity == \"negative\" ) emit(doc.lga_code, 1);}",
+            "reduce":"function (key, values) {  return sum(values); }"
+        },
+        "score":{
+            "map":"function(doc){ if (doc.created_at > "+ starttime +  " && doc.created_at <"+ endtime +") emit(doc.lga_code, 1);}",
+            "reduce":"function (key, values) { return sum(values);}"
+        },
         "keyword":{
-            "map":"function(doc){ for (i = 0; i < doc.rows.length; i++){ if ( new Date(doc.rows[i].created_at).getTime() > "+ starttime +  " && new Date(doc.rows[i].created_at).getTime() <"+ endtime +") emit(doc.rows[i].lga_code, doc.rows[i].keywords)};}",
+            "map":"function(doc){ if (doc.created_at > "+ starttime +  " && doc.created_at <"+ endtime +") emit(doc.lga_code, doc.keywords);}",
             "reduce":"function (key, values) {  return values; }"
-            }
         }
-        db['_design/example'] = dict(language='javascript', views=viewData)
+        }
+        db['_design/example4'] = dict(language='javascript', views=viewData)
 
-        score_view = db.view('example/score',group = True)
-        emotion_view = db.view('example/emotion',group = True)
-        keyword_view = db.view('example/keyword',group = True)
+        emotion_1_view = db.view('example4/emotion_1',group = True)
+        emotion_2_view = db.view('example4/emotion_2',group = True)
+        emotion_3_view = db.view('example4/emotion_3',group = True)
+        score_view = db.view('example4/score',group = True)
+        keyword_view = db.view('example4/keyword',group = True)
 
 
         # score 
@@ -77,26 +87,6 @@ def statistics():
                 covid_attention[lga] = 0 
 
 
-        # emotion 
-        emotion_result={}
-        for row in emotion_view:
-            emotion_result[row.key]= row.value
-
-    
-        major_emotion = {}
-        emotion_component = {}
-        for lga in new_lga_id:
-            if emotion_result.get(lga,"NA") != "NA":
-                emotion_data = emotion_result[lga][0]
-                emotion_counter = Counter(emotion_data)
-                majority = emotion_counter.most_common(1)[0][0]
-                major_emotion[lga] = majority
-                emotion_component[lga] = dict(emotion_counter)
-            else:
-                major_emotion[lga] = ""
-                emotion_component[lga] = {}    
-    
-
         # keyword
         keyword={}
         for row in keyword_view:
@@ -105,25 +95,117 @@ def statistics():
         keyword_data = {}
         for lga in new_lga_id:
             key_list = []
-            if keyword.get(lga,"NA") != "NA":        
-                for each in keyword[lga][0]:
-                    key_list.extend(each)
+            if keyword.get(lga,"NA") != "NA":
+                for dic in keyword[lga]:
+                    for each in dic:
+                        for key in each:
+                            if isinstance(key, str):
+                                key_list.append(key)
+
+
                 keydict = dict(Counter(key_list))  
                 keyword_list = []
                 for k in keydict:
                     text={}
-                    text["text"] = k
-                    text["value"] = keydict[k]
+                    text[k] = keydict[k]
+
                     keyword_list.append(text)      
                 keyword_data[lga] = keyword_list
             else:
                 keyword_data[lga] = []
+    
+        # positive 
+        positive_list={}
+        for row in emotion_1_view:
+            positive_list[row.key]= row.value
 
+        positive_num = {}
+        for lga in new_lga_id:
+            if positive_list.get(lga,"NA") != "NA":
+                positive_num[lga] = positive_list[lga]
+            else:
+                positive_num[lga] = 0
+        
+        # neutral 
+        neutral_list={}
+        for row in emotion_2_view:
+            neutral_list[row.key]= row.value
+
+        neutral_num = {}
+        for lga in new_lga_id:
+            if neutral_list.get(lga,"NA") != "NA":
+                neutral_num[lga] = neutral_list[lga]
+            else:
+                neutral_num[lga] = 0
+        
+        # negative 
+        negative_list={}
+        for row in emotion_3_view:
+            negative_list[row.key]= row.value
+
+        negative_num = {}
+        for lga in new_lga_id:
+            if negative_list.get(lga,"NA") != "NA":
+                negative_num[lga] = negative_list[lga]
+            else:
+                negative_num[lga] = 0
+
+
+        major_emotion = []
+        for i in range(len(negative_num)):
+  
+            value = positive_num[new_lga_id[i]] + neutral_num[new_lga_id[i]] + negative_num[new_lga_id[i]]
+            if value != 0:
+                if(max(positive_num[new_lga_id[i]],neutral_num[new_lga_id[i]],negative_num[new_lga_id[i]]) == positive_num[new_lga_id[i]]):
+                    major_emotion.append("positive")
+                elif(max(positive_num[new_lga_id[i]],neutral_num[new_lga_id[i]],negative_num[new_lga_id[i]]) == neutral_num[new_lga_id[i]]):
+                    major_emotion.append("neutral")
+                else:
+                    major_emotion.append("negative")
+            else:
+                major_emotion.append("")
+
+
+        emotion_component = []
+        for i in range(len(negative_num)):
+            newemo = {'positive': 0, 'negative': 0, 'neutral': 0}
+            newemo["positive"] = positive_num[new_lga_id[i]]
+            newemo["neutral"] = positive_num[new_lga_id[i]]
+            newemo["negative"] = positive_num[new_lga_id[i]]
+            newemojson = copy.deepcopy(newemo)
+            emotion_component.append(newemojson)
+
+        #final 
+        final_result = helper.get_scores_from_cached_data(starttime, endtime)
+
+# + final_result[str(api1["features"][i]["properties"]["lga_id"])]['tweet_num']
         for i in range(len(api1["features"])):
-            api1["features"][i]["properties"]["covid_attention"] = covid_attention[api1["features"][i]["properties"]["lga_id"]]
-            api1["features"][i]["properties"]["major_emotion"] = major_emotion[api1["features"][i]["properties"]["lga_id"]]
-            api1["features"][i]["properties"]["emotion_component"] = emotion_component[api1["features"][i]["properties"]["lga_id"]]
-            api1["features"][i]["properties"]["key_words"] = keyword_data[api1["features"][i]["properties"]["lga_id"]]
+            
+            for key,value in final_result[str(new_lga_id[i])]['emotion_component'].items():
+                if key in emotion_component[lgaid_i_map[str(api1["features"][0]["properties"]["lga_id"])]]:
+                    emotion_component[lgaid_i_map[str(api1["features"][0]["properties"]["lga_id"])]][key] += value
+                else:
+                    emotion_component[lgaid_i_map[str(api1["features"][0]["properties"]["lga_id"])]][key] = value
+            
+            emo_com_co = copy.deepcopy(emotion_component[lgaid_i_map[str(api1["features"][0]["properties"]["lga_id"])]])
+
+            one_major_emo = ""
+            value = emo_com_co['positive'] + emo_com_co['neutral'] + emo_com_co['negative']
+            if value != 0:
+                if(max(emo_com_co['positive'],emo_com_co['neutral'],emo_com_co['negative']) == emo_com_co['positive']):
+                    one_major_emo = "positive"
+                elif(max(positive_num[new_lga_id[i]],neutral_num[new_lga_id[i]],negative_num[new_lga_id[i]]) == neutral_num[new_lga_id[i]]):
+                    one_major_emo = "neutral"
+                else:
+                    one_major_emo = "negative"
+            else:
+                one_major_emo = ""
+
+            api1["features"][i]["properties"]["covid_attention"] = covid_attention[api1["features"][i]["properties"]["lga_id"]] + final_result[str(new_lga_id[i])]['tweet_num']
+            api1["features"][i]["properties"]["major_emotion"] = one_major_emo
+            api1["features"][i]["properties"]["emotion_component"] = emotion_component[lgaid_i_map[str(api1["features"][0]["properties"]["lga_id"])]]
+            # api1["features"][i]["properties"]["key_words"] = keyword_data[api1["features"][i]["properties"]["lga_id"]]
+            api1["features"][i]["properties"]["key_words"] = final_result[str(new_lga_id[i])]['keyword']
 
         return json.dumps(api1, ensure_ascii=False)
 
@@ -160,54 +242,55 @@ def queryRelationship():
         err["message"] = "Database connection error."
         return json.dumps(err, ensure_ascii=False)
     else:
-        mytemp = db.get('_design/example2')
+        mytemp = db.get('_design/example5')
         if mytemp is not None:
-            del db['_design/example2']
+            del db['_design/example5']
     
         viewData = {
-        "tweetnum":{
-            "map":"function(doc){ for (i = 0; i < doc.rows.length; i++){ if ( new Date(doc.rows[i].created_at).getTime() > "+ starttime +  " && new Date(doc.rows[i].created_at).getTime() <"+ endtime +") emit(doc.rows[i].lga_code, 1)};}",
-            "reduce":"function (key, values) {  return sum(values); }"
+        "score":{
+            "map":"function(doc){ if (doc.created_at > "+ starttime +  " && doc.created_at <"+ endtime +") emit(doc.lga_code, 1);}",
+            "reduce":"function (key, values) { return sum(values);}"
         },
         "emotionscore":{
-            "map":"function(doc){ for (i = 0; i < doc.rows.length; i++){ if ( new Date(doc.rows[i].created_at).getTime() > "+ starttime +  " && new Date(doc.rows[i].created_at).getTime() <"+ endtime +") emit(doc.rows[i].lga_code, doc.rows[i].polarity_value)};}",
+            "map":"function(doc){ if (doc.created_at > "+ starttime +  " && doc.created_at <"+ endtime +") emit(doc.lga_code, doc.polarity_value);}",
             "reduce":"function (key, values) {  return sum(values); }"
-            }
         }
-        db['_design/example2'] = dict(language='javascript', views=viewData)
+        }
+        db['_design/example5'] = dict(language='javascript', views=viewData)
 
-        tweetnum_view = db.view('example2/tweetnum',group = True)
-        emotion_view = db.view('example2/emotionscore',group = True)
-  
-        tnum_result={}
-        for row in tweetnum_view:
-            tnum_result[row.key]= row.value
-    
-        tweet_num = {}
+
+        new_lga_id = [20660, 20910, 21110,21180,21450,21610,21890,22170,22310,22670,23110,23270,23670,24130,24210,24330,24410,24600,24650,24850,24970,25060,25150,25250,25340,25620,25710,25900,26350,26980,27070,27260,27350,27450]
+
+
+        score_view = db.view('example5/score',group = True)
+        emotion_score_view = db.view('example5/emotionscore',group = True)
+
+        # score 
+        score={}
+        for row in score_view:
+            score[row.key]= row.value
+
+        covid_attention = {}
         for lga in new_lga_id:
-            if tnum_result.get(lga,"NA") != "NA":
-                tweet_num[lga] = tnum_result[lga]
+            if score.get(lga,"NA") != "NA":
+                covid_attention[lga] = score[lga]
             else:
-                tweet_num[lga] = 0 
+                covid_attention[lga] = 0 
 
-        api2_tnum = []
-        for lga in new_lga_id:
-            api2_tnum.append(tweet_num[lga])
-
+        # emotion score
         emotion_result={}
-        for row in emotion_view:
+        for row in emotion_score_view:
             emotion_result[row.key]= row.value
-    
+
         emotion_num = {}
         for lga in new_lga_id:
             if emotion_result.get(lga,"NA") != "NA":
-                emotion_num[lga] = round(emotion_result[lga],2)
+                if covid_attention[lga] != 0:
+                    emotion_num[lga] = round(emotion_result[lga] / covid_attention[lga],2)
+                else:
+                    emotion_num[lga] = 0
             else:
                 emotion_num[lga] = 0 
-    
-        api2_emotion = []
-        for lga in new_lga_id:
-            api2_emotion.append(emotion_num[lga])
 
         lgaid_i_map = {"20660": 0, "20910": 1, "21110": 2, "21180": 3, "21450": 4, "21610": 5, "21890": 6, "22170": 7, "22310": 8, "22670": 9, "23110": 10, "23270": 11, "23670": 12, "24130": 13, "24210": 14, "24330": 15, "24410": 16, "24600": 17, "24650": 18, "24850": 19, "24970": 20, "25060": 21, "25150": 22, "25250": 23, "25340": 24, "25620": 25, "25710": 26, "25900": 27, "26350": 28, "26980": 29, "27070": 30, "27260": 31, "27350": 32, "27450": 33}
  
@@ -222,12 +305,15 @@ def queryRelationship():
         fin_averge_age = []
         fin_homeless_rate = []
 
+        # final
+        final_result = helper.get_scores_from_cached_data(starttime, endtime)
+
         for each in query_lga:
             index = lgaid_i_map[str(each)]
     
             fin_lga_name.append(api2["data"]["lga_name"][index])
-            fin_emotion_score.append(api2_emotion[index])
-            fin_tweet_num.append(api2_tnum[index])
+            fin_emotion_score.append(emotion_num[each] + final_result[str(each)]['emotion_score'])
+            fin_tweet_num.append(covid_attention[each] + final_result[str(each)]['tweet_num'])
             fin_GP_num.append(api2["data"]["factor"]["GP_num"][index])
             fin_education_rank.append(api2["data"]["factor"]["education_rank"][index])
             fin_population_num.append(api2["data"]["factor"]["population_num"][index])
@@ -294,29 +380,29 @@ def querylgaEmotion():
           del db['_design/example3']
     
         viewData = {
-        "possub":{
-            "map":"function(doc){ for (i = 0; i < doc.rows.length; i++){ if ( new Date(doc.rows[i].created_at).getTime() > "+ starttime +  " && new Date(doc.rows[i].created_at).getTime() <"+ endtime +"){if(doc.rows[i].polarity == \"positive\" && doc.rows[i].subjectivity == \"subjective\"){emit(doc.rows[i].lga_code, 1)}}};}",
-            "reduce":"function (key, values) {  return sum(values); }"
+            "possub":{
+                "map":"function(doc){ if (doc.created_at > "+ starttime +  " && doc.created_at <"+ endtime +" && doc.polarity == \"positive\" && doc.subjectivity == \"subjective\") emit(doc.lga_code, 1);}",
+                "reduce":"function (key, values) {  return sum(values); }"
             },
-        "posobj":{
-            "map":"function(doc){ for (i = 0; i < doc.rows.length; i++){ if ( new Date(doc.rows[i].created_at).getTime() > "+ starttime +  " && new Date(doc.rows[i].created_at).getTime() <"+ endtime +"){if(doc.rows[i].polarity == \"positive\" && doc.rows[i].subjectivity == \"objective\"){emit(doc.rows[i].lga_code, 1)}}};}",
-            "reduce":"function (key, values) {  return sum(values); }"
+            "posobj":{
+                "map":"function(doc){ if (doc.created_at > "+ starttime +  " && doc.created_at <"+ endtime +" && doc.polarity == \"positive\" && doc.subjectivity == \"objective\") emit(doc.lga_code, 1);}",
+                "reduce":"function (key, values) {  return sum(values); }"
             },
-        "neusub":{
-            "map":"function(doc){ for (i = 0; i < doc.rows.length; i++){ if ( new Date(doc.rows[i].created_at).getTime() > "+ starttime +  " && new Date(doc.rows[i].created_at).getTime() <"+ endtime +"){if(doc.rows[i].polarity == \"neutral\" && doc.rows[i].subjectivity == \"subjective\"){emit(doc.rows[i].lga_code, 1)}}};}",
-            "reduce":"function (key, values) {  return sum(values); }"
+            "neusub":{
+                "map":"function(doc){ if (doc.created_at > "+ starttime +  " && doc.created_at <"+ endtime +" && doc.polarity == \"neutral\" && doc.subjectivity == \"subjective\") emit(doc.lga_code, 1);}",
+                "reduce":"function (key, values) {  return sum(values); }"
             },
-        "neuobj":{
-            "map":"function(doc){ for (i = 0; i < doc.rows.length; i++){ if ( new Date(doc.rows[i].created_at).getTime() > "+ starttime +  " && new Date(doc.rows[i].created_at).getTime() <"+ endtime +"){if(doc.rows[i].polarity == \"neutral\" && doc.rows[i].subjectivity == \"objective\"){emit(doc.rows[i].lga_code, 1)}}};}",
-            "reduce":"function (key, values) {  return sum(values); }"
+            "neuobj":{
+                "map":"function(doc){ if (doc.created_at > "+ starttime +  " && doc.created_at <"+ endtime +" && doc.polarity == \"neutral\" && doc.subjectivity == \"objective\") emit(doc.lga_code, 1);}",
+                "reduce":"function (key, values) {  return sum(values); }"
             },
-        "negsub":{
-            "map":"function(doc){ for (i = 0; i < doc.rows.length; i++){ if ( new Date(doc.rows[i].created_at).getTime() > "+ starttime +  " && new Date(doc.rows[i].created_at).getTime() <"+ endtime +"){if(doc.rows[i].polarity == \"negative\" && doc.rows[i].subjectivity == \"subjective\"){emit(doc.rows[i].lga_code, 1)}}};}",
-            "reduce":"function (key, values) {  return sum(values); }"
+            "negsub":{
+                "map":"function(doc){ if (doc.created_at > "+ starttime +  " && doc.created_at <"+ endtime +" && doc.polarity == \"negative\" && doc.subjectivity == \"subjective\") emit(doc.lga_code, 1);}",
+                "reduce":"function (key, values) {  return sum(values); }"
             },
-        "negobj":{
-            "map":"function(doc){ for (i = 0; i < doc.rows.length; i++){ if ( new Date(doc.rows[i].created_at).getTime() > "+ starttime +  " && new Date(doc.rows[i].created_at).getTime() <"+ endtime +"){if(doc.rows[i].polarity == \"negative\" && doc.rows[i].subjectivity == \"objective\"){emit(doc.rows[i].lga_code, 1)}}};}",
-            "reduce":"function (key, values) {  return sum(values); }"
+            "negobj":{
+                "map":"function(doc){ if (doc.created_at > "+ starttime +  " && doc.created_at <"+ endtime +" && doc.polarity == \"negative\" && doc.subjectivity == \"objective\") emit(doc.lga_code, 1);}",
+                "reduce":"function (key, values) {  return sum(values); }"
             }
         }
         db['_design/example3'] = dict(language='javascript', views=viewData)
@@ -396,6 +482,9 @@ def querylgaEmotion():
                 }
             ]
         }
+        
+        # final
+        final_result = helper.get_scores_from_cached_data(starttime, endtime)
 
         lga_value_list = []
 
@@ -404,22 +493,45 @@ def querylgaEmotion():
             index = lgaid_i_map[str(lga)]    
             newlgajson = copy.deepcopy(anlgajson)
     
-            newlgajson["children"][0]["value"] = possub_result[index] + posobj_result[index]
-            newlgajson["children"][0]["children"][0]["value"] = possub_result[index]
-            newlgajson["children"][0]["children"][1]["value"] = posobj_result[index]
-            newlgajson["children"][1]["value"] = neusub_result[index] + neuobj_result[index]
-            newlgajson["children"][1]["children"][0]["value"] = neusub_result[index]
-            newlgajson["children"][1]["children"][1]["value"] = neuobj_result[index]
-            newlgajson["children"][2]["value"] = negsub_result[index] + negobj_result[index]
-            newlgajson["children"][2]["children"][0]["value"] = negsub_result[index]
-            newlgajson["children"][2]["children"][1]["value"] = negobj_result[index]
-            newlgajson["value"] = newlgajson["children"][0]["value"] + newlgajson["children"][1]["value"] + newlgajson["children"][2]["value"]
+            newlgajson["children"][0]["value"] = possub_result[index] + posobj_result[index] + final_result[str(lga)]['children']['children'][0]['value']
+            newlgajson["children"][0]["children"][0]["value"] = possub_result[index] + final_result[str(lga)]['children']['children'][0]['children'][0]['value']
+            newlgajson["children"][0]["children"][1]["value"] = posobj_result[index] + final_result[str(lga)]['children']['children'][0]['children'][1]['value']
+            newlgajson["children"][1]["value"] = neusub_result[index] + neuobj_result[index] + final_result[str(lga)]['children']['children'][1]['value']
+            newlgajson["children"][1]["children"][0]["value"] = neusub_result[index] + final_result[str(lga)]['children']['children'][1]['children'][0]['value']
+            newlgajson["children"][1]["children"][1]["value"] = neuobj_result[index] + final_result[str(lga)]['children']['children'][1]['children'][1]['value']
+            newlgajson["children"][2]["value"] = negsub_result[index] + negobj_result[index] + final_result[str(lga)]['children']['children'][2]['value']
+            newlgajson["children"][2]["children"][0]["value"] = negsub_result[index] + final_result[str(lga)]['children']['children'][2]['children'][0]['value']
+            newlgajson["children"][2]["children"][1]["value"] = negobj_result[index] + final_result[str(lga)]['children']['children'][2]['children'][1]['value']
+            newlgajson["value"] = newlgajson["children"][0]["value"] + newlgajson["children"][1]["value"] + newlgajson["children"][2]["value"] + final_result[str(lga)]['children']['value']
             newlgajson["name"] = new_lga_name[index]
             data = copy.deepcopy(newlgajson)
             lga_value_list.append(data)
         api3["data"][0]["children"] = lga_value_list
 
         return json.dumps(api3, ensure_ascii=False)
+
+
+
+def processview(view):
+    new_lga_id = [20660, 20910, 21110,21180,21450,21610,21890,22170,22310,22670,23110,23270,23670,24130,24210,24330,24410,24600,24650,24850,24970,25060,25150,25250,25340,25620,25710,25900,26350,26980,27070,27260,27350,27450]
+    list1={}
+    for row in view:
+        list1[row.key]= row.value
+    
+    list2 = {}
+    for lga in new_lga_id:
+        if list1.get(lga,"NA") != "NA":
+            list2[lga] =list1[lga]
+        else:
+            list2[lga] = 0 
+            
+    result = []
+    for lga in new_lga_id:
+        result.append(list2[lga])
+    return result
+
+
+
 
 @server.errorhandler(400)
 def bad_request(e):
