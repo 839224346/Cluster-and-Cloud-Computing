@@ -6,7 +6,7 @@ import { mapStyle } from './resource/map-style'
 import {CityList} from './resource/city_list'
 import { Select, DatePicker, Button, Layout,Menu ,Form} from 'antd'
 import Charts from './charts'
-// import { SearchOutlined } from '@ant-design/icons'
+import { GoogleOutlined,BarChartOutlined} from '@ant-design/icons'
 import InfoWindow from './InfoWindow'
 import * as echarts from 'echarts'
 import 'antd/dist/antd.css'
@@ -83,9 +83,6 @@ export default class Map extends Component{
     let infowindow = new google.maps.InfoWindow({
       content : ''
     })
-    // let marker, i
-    // let markers = []
-    // let locations = []
     let colors = this.gradient('#ffffff','#ff9900',7)
    
 
@@ -98,7 +95,6 @@ export default class Map extends Component{
 
     map.data.setStyle((feature) => {
 
-      console.log('feature',feature)
       let total = feature.getProperty(this.state.searchFactor)
       let name = feature.getProperty('name')
 
@@ -338,23 +334,17 @@ export default class Map extends Component{
   }
 
   search = () =>{
+    this.setState({
+      isShowMap : true
+    })
     // let url = "http://0.0.0.0:6100/api/statistics/zone/melbourn?begintime=1616194716000&&endtime=1620601116000"
     let url = `/api/statistics/zone/melbourn?begintime=${this.state.startTime}&&endtime=${this.state.endTime}`;
     this.mapBuild(url)
   }
   show = () => {
-    if(this.state.isShowMap){
-      // this.getEmotionData()
-      // this.getRelationData();
       this.setState({
         isShowMap : false
       })
-    }else {
-      this.setState({
-        isShowMap : true
-      })
-    }
-
   }
   render(){
     const {Option} = Select;
@@ -363,13 +353,14 @@ export default class Map extends Component{
         <Layout>
           <Layout.Sider style={{backgroundColor:'#f0f2f5'}} width='275'>
             <Menu  mode="inline" defaultOpenKeys={['sub1']} style={{backgroundColor:'#f0f2f5'}}>
-            {/* <Menu.SubMenu key="sub1" title="Navigation One" > */}
+            <Menu.SubMenu key="sub1" title="Map Search" icon={<GoogleOutlined />}>
               <Form
                 labelCol={{ span: 4 }}
                 wrapperCol={{ span: 14 }}
                 layout="horizontal"
+                style={{margin:'20px 10px'}}
               >
-                <Form.Item label="factor">
+                <Form.Item label="Factor" style={{width:'300px'}}>
                 <Select
                   style={{ width: 200 }}
                   placeholder="Select a factor"
@@ -385,40 +376,55 @@ export default class Map extends Component{
                   <Option value="Education">Education</Option>
                 </Select>
                 </Form.Item>
-                <Form.Item label="city">
-                <Select
-                  style={{ width: 200 ,maxHeight:100}}
-                  placeholder="Select a city"
-                  optionFilterProp="children"
-                  mode="multiple"
-                  onChange={this.getCity}
-                  filterOption={(input, option) =>
-                    option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-                  }
-                >
-                  {Object.keys(CityList).map((key)=>{
-                    return <Option value={key}>{CityList[key]}</Option>
-                  })}
-                  <Option value="covid_attention">Covid Attention</Option>
-                  <Option value="GP_num">GP Number</Option>
-                  <Option value="level_advanced">Level Advanced</Option>
-                  <Option value="Education">Education</Option>
-                </Select>
+                <Form.Item label="Begin" style={{width:'300px'}}>
+                  <DatePicker size={'default'} picker="month" onChange={this.getDateTime('startTime')} style={{width:'200px'}}/>
                 </Form.Item>
-                <Form.Item label="beginDate">
-                  <DatePicker size={'default'} picker="month" onChange={this.getDateTime('startTime')}/>
-                </Form.Item>
-                <Form.Item label="endDate">
-                  <DatePicker size={'default'} picker="month" onChange={this.getDateTime('endTime')}/>
+                <Form.Item label="End" style={{width:'300px'}}>
+                  <DatePicker size={'default'} picker="month" onChange={this.getDateTime('endTime')} style={{width:'200px'}}/>
                 </Form.Item>
                 <Form.Item>
-                  <Button onClick={this.search}>Search</Button>
-                </Form.Item>
-                <Form.Item>
-                <Button onClick={this.show}>{this.state.isShowMap ? 'Show' : 'Back'}</Button>
+                  <div style={{display:'flex', justifyContent:'center',width:'250px'}}>
+                  <Button type="primary" onClick={this.search} style={{width:'120px',borderRadius:'5px'}}>Search</Button>
+                  </div>
                 </Form.Item>
               </Form>
-            {/* </Menu.SubMenu> */}
+            </Menu.SubMenu>
+            <Menu.SubMenu key="sub2" title="Charts Search" icon={<BarChartOutlined />}>
+            <Form
+                labelCol={{ span: 4 }}
+                wrapperCol={{ span: 14 }}
+                layout="horizontal"
+                style={{margin:'20px 10px'}}
+              >
+                <Form.Item label="City"  style={{width:'300px'}}>
+                  <Select
+                    style={{ width: 200 ,maxHeight:100}}
+                    placeholder="Select cities"
+                    optionFilterProp="children"
+                    mode="multiple"
+                    onChange={this.getCity}
+                    filterOption={(input, option) =>
+                      option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                    }
+                  >
+                    {Object.keys(CityList).map((key)=>{
+                      return <Option value={key}>{CityList[key]}</Option>
+                    })}
+                  </Select>
+                </Form.Item>
+                <Form.Item label="Begin" style={{width:'300px'}}>
+                  <DatePicker size={'default'} picker="month" onChange={this.getDateTime('startTime')} style={{width:'200px'}}/>
+                </Form.Item>
+                <Form.Item label="End" style={{width:'300px'}}>
+                  <DatePicker size={'default'} picker="month" onChange={this.getDateTime('endTime')} style={{width:'200px'}}/>
+                </Form.Item>
+                <Form.Item>
+                  <div style={{display:'flex', justifyContent:'center',width:'250px'}}>
+                    <Button type="primary" onClick={this.show} style={{width:'120px',borderRadius:'5px'}}>Show</Button>
+                  </div>
+                </Form.Item>
+            </Form>
+            </Menu.SubMenu>
             </Menu>
           </ Layout.Sider>
           <Layout.Content>
