@@ -31,7 +31,7 @@ def get_months():
 
 
 def get_scores_from_cached_data(starttime, endtime):
-    couch = couchdb.Server('http://admin:admin@localhost:5984/')
+    couch = couchdb.Server('http://admin:admin@127.0.0.1:5984/')
     db = couch['final']
     mytemp = db.get('_design/example')
     if mytemp is not None:
