@@ -353,11 +353,11 @@ export default class Map extends Component{
     let time = new Date(dateString)
     if(type === 'startTime'){
       this.setState({
-        startTime: time.getTime()
+        startTime: Math.round(time.getTime()/1000)
       })
     }else if(type==='endTime'){
       this.setState({
-        endTime: time.getTime()
+        endTime: Math.round(time.getTime()/1000)
       })
     }
 
