@@ -340,25 +340,6 @@ def queryRelationship():
 
         return json.dumps(api2, ensure_ascii=False)
 
-def processview(view):
-    new_lga_id = [20660, 20910, 21110,21180,21450,21610,21890,22170,22310,22670,23110,23270,23670,24130,24210,24330,24410,24600,24650,24850,24970,25060,25150,25250,25340,25620,25710,25900,26350,26980,27070,27260,27350,27450]
-    list1={}
-    for row in view:
-        list1[row.key]= row.value
-    
-    list2 = {}
-    for lga in new_lga_id:
-        if list1.get(lga,"NA") != "NA":
-            list2[lga] =list1[lga]
-        else:
-            list2[lga] = 0 
-            
-    result = []
-    for lga in new_lga_id:
-        result.append(list2[lga])
-    return result
-
-
 @server.route('/api/statistics/lgaEmotion',methods = ['post'])
 def querylgaEmotion():
 
