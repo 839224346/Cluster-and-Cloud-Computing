@@ -32,7 +32,11 @@ def get_months():
 
 def get_scores_from_cached_data(starttime, endtime):
     couch = couchdb.Server('http://admin:admin@127.0.0.1:5984/')
-    db = couch['final']
+    try:
+        db = couch.create('final')
+    except:
+        db = couch['final']
+        
     mytemp = db.get('_design/example')
     if mytemp is not None:
         del db['_design/example']
