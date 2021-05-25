@@ -572,5 +572,4 @@ def internal_server_error(e):
     err["message"] = "An internal server error occurred."
     return json.dumps(err, ensure_ascii=False)
     
-if __name__ == '__main__':
-    server.run(port = 6100,host = '0.0.0.0')
+server.run(port = 6100,host = '0.0.0.0',threaded = True)
