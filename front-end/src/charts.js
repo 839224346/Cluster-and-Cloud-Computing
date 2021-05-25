@@ -172,6 +172,20 @@ export default class Charts extends Component{
         // const lga_name = relationData.lga_name;
         // const {score, GP_num, education_rank, population_num,averg_income, averg_age, homeless_rate} = relationData.factor;
         var myChart = echarts.init(document.getElementById(type));
+        let key = '';
+        if(type === "gp_chart"){
+            key = "GP_num"
+        }else if(type === "education_chart"){
+            key = "education_rank"
+        }else if(type === "population_chart"){
+            key = "population_num"
+        }else if(type === "income_chart"){
+            key = "averg_income"
+        }else if(type === "age_chart"){
+            key = "averg_age"
+        }else if(type === "homeless_chart"){
+            key = "homeless_rate"
+        }
         let option;
         option = {
             dackMode: true,
@@ -208,7 +222,7 @@ export default class Charts extends Component{
                     emphasis: {
                         focus: 'series'
                     },
-                    data: this.state.relationData.factor.emotion_score
+                    data: this.state.relationData.factor.emotion_score * 100000
                 },
                 {
                     name: 'Tweet Number',
@@ -224,7 +238,7 @@ export default class Charts extends Component{
                     emphasis: {
                         focus: 'series'
                     },
-                    data: this.state.relationData.factor[type]
+                    data: this.state.relationData.factor[key]
                 }
             ]
         };
