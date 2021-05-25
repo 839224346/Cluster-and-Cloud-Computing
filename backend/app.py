@@ -505,7 +505,7 @@ def querylgaEmotion():
             newlgajson["children"][2]["value"] = negsub_result[index] + negobj_result[index] + final_result[str(lga)]['children']['children'][2]['value']
             newlgajson["children"][2]["children"][0]["value"] = negsub_result[index] + final_result[str(lga)]['children']['children'][2]['children'][0]['value']
             newlgajson["children"][2]["children"][1]["value"] = negobj_result[index] + final_result[str(lga)]['children']['children'][2]['children'][1]['value']
-            newlgajson["value"] = newlgajson["children"][0]["value"] + newlgajson["children"][1]["value"] + newlgajson["children"][2]["value"] + final_result[str(lga)]['children']['value']
+            newlgajson["value"] = newlgajson["children"][0]["value"] + newlgajson["children"][1]["value"] + newlgajson["children"][2]["value"] 
             newlgajson["name"] = new_lga_name[index]
             data = copy.deepcopy(newlgajson)
             lga_value_list.append(data)
