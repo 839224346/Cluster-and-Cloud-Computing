@@ -208,7 +208,7 @@ export default class Charts extends Component{
                     emphasis: {
                         focus: 'series'
                     },
-                    data: this.state.relationData.emotion_score
+                    data: this.state.relationData.factor.emotion_score
                 },
                 {
                     name: 'Tweet Number',
@@ -216,7 +216,7 @@ export default class Charts extends Component{
                     emphasis: {
                         focus: 'series'
                     },
-                    data: this.state.relationData.tweet_num
+                    data: this.state.relationData.factor.tweet_num
                 },
                 {
                     name: type,
@@ -224,7 +224,7 @@ export default class Charts extends Component{
                     emphasis: {
                         focus: 'series'
                     },
-                    data: this.state.relationData.type
+                    data: this.state.relationData.factor[type]
                 }
             ]
         };
