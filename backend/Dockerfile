@@ -11,9 +11,9 @@ WORKDIR /app
 
 COPY . /app
 
-RUN pip3 --no-cache-dir install -r requirements.txt
+RUN pip3 install -r requirements.txt
 
 EXPOSE 6100
 
 ENTRYPOINT ["python3"]
-CMD ["server.py"]
+CMD ["app.py"]
