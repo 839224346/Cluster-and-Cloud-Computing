@@ -13,6 +13,10 @@ server = flask.Flask(__name__)
 CORS(server, resources=r'/*')
 # CORS(server, supports_credentials=True)
 
+@server.route("/test", methods = ['GET'])
+def hello_world():
+    return "hello world"
+
 @server.route('/api/statistics/zone/melbourn',methods=['get'])
 def statistics():  
     
