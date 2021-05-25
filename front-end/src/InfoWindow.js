@@ -21,7 +21,7 @@ function InfoWindow(props){
             <div id="infoChart" style={{height:'200px',width:'100%'}}></div>
             </Col>
             <Col span={8}>
-            <Divider style={{color:'#0e4381'}}>Emotion Component</Divider>
+            <Divider style={{color:'#0e4381'}}>Cloud Words</Divider>
             <div id="cloudChart" style={{height:'200px',width:'100%'}}></div>
             </Col>
             </Row>
