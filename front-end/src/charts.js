@@ -238,7 +238,7 @@ export default class Charts extends Component{
                     emphasis: {
                         focus: 'series'
                     },
-                    data: this.state.relationData.factor[key].sort()
+                    data: this.state.relationData.factor[key]
                 }
             ]
         };
