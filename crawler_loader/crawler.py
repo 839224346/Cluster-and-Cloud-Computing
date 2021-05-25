@@ -1,21 +1,18 @@
 import tweepy
 from shapely.geometry import shape, point
-import json
 import pickle
 import random
 from textblob import TextBlob
 import couchdb
 import yake
 from datetime import datetime
-import time
-import traceback
 import os
 
-couch = couchdb.Server('http://admin:admin@127.0.0.1:5984/')
+couch = couchdb.Server('http://admin:admin@localhost:5984/')
 try:
-    db = couch.create('ccc')
+    db = couch.create('realtime')
 except:
-    db = couch['ccc']
+    db = couch['realtime']
 
 # load map
 dirname = os.path.dirname(__file__)
