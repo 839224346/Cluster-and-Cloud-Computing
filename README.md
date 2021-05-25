@@ -8,8 +8,7 @@ alongside/compared	 with/augment the	 data	 available	 within	 the	AURIN	 platfo
 knowledge	of	life	in	the	cities of	Australia.
 
 
-## Private Key to Run Ansible Playbook
-### YjlmN2E2NTlkMzIzZTRh
+
 
 
 # CCC Group 34
@@ -57,38 +56,35 @@ https://docs.google.com/presentation/d/1PV_Ui_XYZrv7qMABt_pXkZIt7Gh6DANiCvhuGUy2
 
 ### Deployment Operation 
 1. Ansible creates 4 hosts with one click
-2. Docker runs 3 CouchDB instances
-3. Ansible controls Docker-compose with services on each instances 
+2. Ansible sets server envrionments 
+3. Ansible deploys Front-end, Back-end, Couchdb cluster in Docker and initiates servers of Nginx, Crawler and Data Loader
 
 ### Server Arrangement
 
-Server1: 172.26.37.225
+Server1: 172.26.132.20
     
-    CouchDB/ couchdb:2.3.0
-    Frontend/
-    Nginx/ nginx:lastest
-    CAdvisor/
+    Frontend/ react
+    Nginx/ 1.reverse proxy server 2.load balancer for backend
 
 
-Server2: 172.26.38.110
+Server2: 172.26.133.10
     
-    CouchDB/couchdb:2.3.0
-    Backend/ lihuanz/my-backend:lastest
-    Spider/ 
-    CAdvisor/
+    CouchDB/ master node
+    Backend/ flask
 
 
-Server3: 172.26.38.1
+Server3: 172.26.131.108
     
-    CouchDB/couchdb:2.3.0
-    Backend/
-    NLP/
-    CAdvisor/
+    CouchDB/ slave node 1
+    Backend/ flask
+    Data Loader/
 
 
-Server4: 172.26.38.11
-
-    MachineLearning/
-    Grafana/ grafana/grafana:lastest
-    InfluxDB/ influxdb:lastest
-    cAdvisor/ google/cadvisor:lastest
+Server4: 172.26.129.163
+    
+    CouchDB/ slave node 2
+    Crawler/ 
+    
+    
+# Private Key to Run Ansible Playbook
+## YjlmN2E2NTlkMzIzZTRh
