@@ -180,9 +180,9 @@ export default class Charts extends Component{
         }else if(type === "population_chart"){
             key = "population_num"
         }else if(type === "income_chart"){
-            key = "averg_income"
+            key = "averge_income"
         }else if(type === "age_chart"){
-            key = "averg_age"
+            key = "averge_age"
         }else if(type === "homeless_chart"){
             key = "homeless_rate"
         }
