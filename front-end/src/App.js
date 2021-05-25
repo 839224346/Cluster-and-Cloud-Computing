@@ -24,7 +24,7 @@ export default class Map extends Component{
       searchFactor:'',
       startTime:0,
       endTime:0,
-      isShowMap: true,
+      isShowMap: 1,
       emotionData:[],
       relationData:{},
       cityList: []
@@ -370,16 +370,27 @@ export default class Map extends Component{
 
   search = () =>{
     this.setState({
-      isShowMap : true
+      isShowMap : 1
     })
     // let url = "http://0.0.0.0:6100/api/statistics/zone/melbourn?begintime=1616194716000&&endtime=1620601116000"
     let url = `/api/statistics/zone/melbourn?begintime=${this.state.startTime}&&endtime=${this.state.endTime}`;
     this.mapBuild(url)
   }
   show = () => {
+    if(this.state.isShowMap !== 0){
       this.setState({
-        isShowMap : false
+        isShowMap : 0
       })
+    }else if(this.state.isShowMap !== -1){
+      this.setState({
+        isShowMap : -1
+      })
+      setTimeout(()=>{
+        this.setState({
+          isShowMap : 0
+        })
+      },200)
+    }
   }
   render(){
     const {Option} = Select;
@@ -465,15 +476,16 @@ export default class Map extends Component{
           <Layout.Content>
           <div id="gmap">
             {/* <loading :active.sync="visible" :can-cancel="true"></loading> */}
-            <div id="map_canvas" style={this.state.isShowMap ? { height:"100vh", width:'100%'}: { height:"0vh", width:'100%'}} ></div>  
+            <div id="map_canvas" style={this.state.isShowMap ===1 ? { height:"100vh", width:'100%'}: { height:"0vh", width:'100%'}} ></div>  
           </div>
-          {!this.state.isShowMap && <Charts 
+          {(this.state.isShowMap !== 1) && (this.state.isShowMap === 0 ? <Charts 
                                       emotionData={this.state.emotionData}
                                       relationData={this.state.relationData} 
                                       cityList = {this.state.cityList}
                                       startTime = {this.state.startTime}
                                       endTime = {this.state.endTime}
-                                      />}
+                                      />
+                                    : <div>Loading...</div>)}
           </Layout.Content>
 
           </Layout>
