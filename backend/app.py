@@ -12,12 +12,11 @@ import helper
 app = flask.Flask(__name__)
 CORS(app, resources=r'/*')
 # CORS(server, supports_credentials=True)
-
 @app.route("/test", methods = ['GET'])
 def hello_world():
     return "hello world"
 
-@server.route('/api/statistics/zone/melbourn',methods=['get'])
+@app.route('/api/statistics/zone/melbourn',methods=['get'])
 def statistics():  
     
     get_data = request.args.to_dict()
@@ -30,7 +29,7 @@ def statistics():
     file1=open('api_1.json')
     api1=json.load(file1)
 
-    lgaid_i_map = conf.lgaid_i_map
+    lgaid_i_map = {"20660": 0, "20910": 1, "21110": 2, "21180": 3, "21450": 4, "21610": 5, "21890": 6, "22170": 7, "22310": 8, "22670": 9, "23110": 10, "23270": 11, "23670": 12, "24130": 13, "24210": 14, "24330": 15, "24410": 16, "24600": 17, "24650": 18, "24850": 19, "24970": 20, "25060": 21, "25150": 22, "25250": 23, "25340": 24, "25620": 25, "25710": 26, "25900": 27, "26350": 28, "26980": 29, "27070": 30, "27260": 31, "27350": 32, "27450": 33}
     
     try:
         couch = couchdb.Server('http://admin:admin@127.0.0.1:5984/')
@@ -112,11 +111,29 @@ def statistics():
                 for k in keydict:
                     text={}
                     text[k] = keydict[k]
-
+                #    if len(new_item["keyword_data"]) != 0:
+                        # final_result[str(lga_id)]['keyword'].append(new_item["keyword_data"][0])
                     keyword_list.append(text)      
                 keyword_data[lga] = keyword_list
             else:
                 keyword_data[lga] = []
+
+            #                     # keydict = dict(Counter(key_list))  
+            #     # keyword_list = []
+            #     # for k in keydict:
+            #     #     text={}
+            #     #     text[k] = keydict[k]
+            #     # #    if len(new_item["keyword_data"]) != 0:
+            #     #         # final_result[str(lga_id)]['keyword'].append(new_item["keyword_data"][0])
+            #     #     keyword_list.append(text) 
+            #     if len(key_list) != 0:
+            #         keyword_data[lga]= []
+            #         keyword_data[lga].append(key_list[0])    
+            #         # keyword_data[lga] = key_list[0]
+            #     else:
+            #         keyword_data[lga] = []
+            # else:
+            #     keyword_data[lga] = []
     
         # positive 
         positive_list={}
@@ -174,8 +191,8 @@ def statistics():
         for i in range(len(negative_num)):
             newemo = {'positive': 0, 'negative': 0, 'neutral': 0}
             newemo["positive"] = positive_num[new_lga_id[i]]
-            newemo["neutral"] = positive_num[new_lga_id[i]]
-            newemo["negative"] = positive_num[new_lga_id[i]]
+            newemo["neutral"] = neutral_num[new_lga_id[i]]
+            newemo["negative"] = negative_num[new_lga_id[i]]
             newemojson = copy.deepcopy(newemo)
             emotion_component.append(newemojson)
 
@@ -209,7 +226,9 @@ def statistics():
             api1["features"][i]["properties"]["major_emotion"] = one_major_emo
             api1["features"][i]["properties"]["emotion_component"] = emotion_component[lgaid_i_map[str(api1["features"][0]["properties"]["lga_id"])]]
             # api1["features"][i]["properties"]["key_words"] = keyword_data[api1["features"][i]["properties"]["lga_id"]]
-            api1["features"][i]["properties"]["key_words"] = final_result[str(new_lga_id[i])]['keyword']
+            api1["features"][i]["properties"]["key_words"] = []
+            api1["features"][i]["properties"]["key_words"].append(final_result[str(new_lga_id[i])]['keyword'])
+
 
         return json.dumps(api1, ensure_ascii=False)
 
@@ -235,7 +254,7 @@ def queryRelationship():
     file2=open('api_2.json')
     api2=json.load(file2)
 
-    new_lga_id = [20660, 20910, 21110,21180,21450,21610,21890,22170,22310,22670,23110,23270,23670,24130,24210,24330,24410,24600,24650,24850,24970,25060,25150,25250,25340,25620,25710,25900,26350,26980,27070,27260,27350,27450]
+    new_lga_id = ["20660", "20910", "21110","21180","21450","21610","21890","22170","22310","22670","23110","23270","23670","24130","24210","24330","24410","24600","24650","24850","24970","25060","25150","25250","25340","25620","25710","25900","26350","26980","27070","27260","27350","27450"]
 
     try:
         couch = couchdb.Server('http://admin:admin@127.0.0.1:5984/')
@@ -263,7 +282,7 @@ def queryRelationship():
         db['_design/example5'] = dict(language='javascript', views=viewData)
 
 
-        new_lga_id = [20660, 20910, 21110,21180,21450,21610,21890,22170,22310,22670,23110,23270,23670,24130,24210,24330,24410,24600,24650,24850,24970,25060,25150,25250,25340,25620,25710,25900,26350,26980,27070,27260,27350,27450]
+        new_lga_id = ["20660", "20910", "21110","21180","21450","21610","21890","22170","22310","22670","23110","23270","23670","24130","24210","24330","24410","24600","24650","24850","24970","25060","25150","25250","25340","25620","25710","25900","26350","26980","27070","27260","27350","27450"]
 
 
         score_view = db.view('example5/score',group = True)
@@ -316,8 +335,8 @@ def queryRelationship():
             index = lgaid_i_map[str(each)]
     
             fin_lga_name.append(api2["data"]["lga_name"][index])
-            fin_emotion_score.append(emotion_num[each] + final_result[str(each)]['emotion_score'])
-            fin_tweet_num.append(covid_attention[each] + final_result[str(each)]['tweet_num'])
+            fin_emotion_score.append(emotion_num[str(each)] + final_result[str(each)]['emotion_score'])
+            fin_tweet_num.append(covid_attention[str(each)] + final_result[str(each)]['tweet_num'])
             fin_GP_num.append(api2["data"]["factor"]["GP_num"][index])
             fin_education_rank.append(api2["data"]["factor"]["education_rank"][index])
             fin_population_num.append(api2["data"]["factor"]["population_num"][index])
@@ -338,7 +357,7 @@ def queryRelationship():
         return json.dumps(api2, ensure_ascii=False)
 
 def processview(view):
-    new_lga_id = [20660, 20910, 21110,21180,21450,21610,21890,22170,22310,22670,23110,23270,23670,24130,24210,24330,24410,24600,24650,24850,24970,25060,25150,25250,25340,25620,25710,25900,26350,26980,27070,27260,27350,27450]
+    new_lga_id = ["20660", "20910", "21110","21180","21450","21610","21890","22170","22310","22670","23110","23270","23670","24130","24210","24330","24410","24600","24650","24850","24970","25060","25150","25250","25340","25620","25710","25900","26350","26980","27070","27260","27350","27450"]
     list1={}
     for row in view:
         list1[row.key]= row.value
@@ -418,7 +437,7 @@ def querylgaEmotion():
         negsub_view = db.view('example3/negsub',group = True)
         negobj_view = db.view('example3/negobj',group = True)
 
-        new_lga_id = [20660, 20910, 21110,21180,21450,21610,21890,22170,22310,22670,23110,23270,23670,24130,24210,24330,24410,24600,24650,24850,24970,25060,25150,25250,25340,25620,25710,25900,26350,26980,27070,27260,27350,27450]
+        new_lga_id = ["20660", "20910", "21110","21180","21450","21610","21890","22170","22310","22670","23110","23270","23670","24130","24210","24330","24410","24600","24650","24850","24970","25060","25150","25250","25340","25620","25710","25900","26350","26980","27070","27260","27350","27450"]
         new_lga_name = ['Banyule', 'Bayside','Boroondara','Brimbank','Cardinia','Casey','Darebin','Frankston','Glen Eira','Greater Dandenong','Hobsons Bay','Hume','Knox','Macedon Ranges','Manningham','Maribyrnong','Maroondah','Melbourne','Melton','Mitchell','Monash','Moonee Valley','Moorabool','Moreland','Mornington Peninsula','Murrindindi','Nillumbik','Port Phillip','Stonnington','Whitehorse','Whittlesea','Wyndham','Yarra','Yarra Ranges']
         lgaid_i_map = {"20660": 0, "20910": 1, "21110": 2, "21180": 3, "21450": 4, "21610": 5, "21890": 6, "22170": 7, "22310": 8, "22670": 9, "23110": 10, "23270": 11, "23670": 12, "24130": 13, "24210": 14, "24330": 15, "24410": 16, "24600": 17, "24650": 18, "24850": 19, "24970": 20, "25060": 21, "25150": 22, "25250": 23, "25340": 24, "25620": 25, "25710": 26, "25900": 27, "26350": 28, "26980": 29, "27070": 30, "27260": 31, "27350": 32, "27450": 33}
 
@@ -537,35 +556,35 @@ def processview(view):
 
 
 
-@server.errorhandler(400)
+@app.errorhandler(400)
 def bad_request(e):
     err = {}
     err["name"] = "400"
     err["message"] = "Unauthorized."
     return json.dumps(err, ensure_ascii=False)
 
-@server.errorhandler(403)
+@app.errorhandler(403)
 def forbidden(e):
     err = {}
     err["name"] = "403"
     err["message"] = "Forbidden."
     return json.dumps(err, ensure_ascii=False)
 
-@server.errorhandler(404)
+@app.errorhandler(404)
 def handle_404_error(e):
     err = {}
     err["name"] = "404 Not Found"
     err["message"] = "The requested URL was not found on the server."
     return json.dumps(err, ensure_ascii=False)
 
-@server.errorhandler(405)
+@app.errorhandler(405)
 def method_not_allowed(e):
     err = {}
     err["name"] = "405"
     err["message"] = "Illegalmethod."
     return json.dumps(err, ensure_ascii=False)
 
-@server.errorhandler(500)
+@app.errorhandler(500)
 def internal_server_error(e):
     err = {}
     err["name"] = "500"
@@ -573,4 +592,4 @@ def internal_server_error(e):
     return json.dumps(err, ensure_ascii=False)
     
 if __name == '__main__':
-    app.run(debug=True, host='0.0.0.0')
+app.run(debug=True, host='0.0.0.0')
