@@ -8,7 +8,7 @@ import yake
 from datetime import datetime
 import os
 
-couch = couchdb.Server('http://admin:admin@localhost:5984/')
+couch = couchdb.Server('http://admin:admin@127.0.0.1:5984/')
 try:
     db = couch.create('realtime')
 except:
