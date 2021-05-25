@@ -1,6 +1,5 @@
 from datetime import datetime
 from datetime import timezone
-from typing_extensions import final
 import couchdb
 import conf
 import copy
