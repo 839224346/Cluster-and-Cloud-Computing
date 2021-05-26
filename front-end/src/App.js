@@ -207,7 +207,7 @@ export default class Map extends Component{
 
   initCloudChart = (key_words) => {
     let CloudData = [];
-    key_words.forEach((item)=>{
+    key_words[0].forEach((item)=>{
       let obj = {};
       obj.name = item;
       obj.value = Math.random(1,100);
