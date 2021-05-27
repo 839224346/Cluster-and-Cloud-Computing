@@ -83,6 +83,7 @@ Server3: 172.26.131.108
 Server4: 172.26.129.163
     
     CouchDB/ slave node 2
+    Backend/ flask
     Crawler/ 
     
     
